@@ -20,7 +20,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_FIRST_NAME = "first_name";
     private static final String COLUMN_LAST_NAME = "last_name";
     private static final String COLUMN_GENDER = "gender";
-    private static final String COLUMN_PASSWORD_HASH = "password_hash"; // Change column name to password_hash
+    private static final String COLUMN_PASSWORD_HASH = "password_hash";
 
     public DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -36,7 +36,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 COLUMN_FIRST_NAME + " TEXT," +
                 COLUMN_LAST_NAME + " TEXT," +
                 COLUMN_GENDER + " TEXT," +
-                COLUMN_PASSWORD_HASH + " TEXT" + // Change column name to password_hash
+                COLUMN_PASSWORD_HASH + " TEXT" +
                 ")";
         db.execSQL(CREATE_USER_TABLE);
     }
@@ -55,7 +55,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_FIRST_NAME, user.getFirstName());
         values.put(COLUMN_LAST_NAME, user.getLastName());
         values.put(COLUMN_GENDER, user.getGender());
-        values.put(COLUMN_PASSWORD_HASH, encryptPassword(user.getPassword())); // Encrypt password before storing
+        values.put(COLUMN_PASSWORD_HASH, encryptPassword(user.getPassword()));
         long result = db.insert(TABLE_USER, null, values);
         db.close();
         return result != -1;
@@ -79,7 +79,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public boolean checkLogin(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String hashedPassword = encryptPassword(password); // Hash the entered password for comparison
+        String hashedPassword = encryptPassword(password);
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + "=? AND " + COLUMN_PASSWORD_HASH + "=?", new String[]{email, hashedPassword});
         boolean valid = cursor.getCount() > 0;
         cursor.close();
@@ -88,24 +88,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     private String encryptPassword(String password) {
         try {
-            // Create MessageDigest instance for SHA-256
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            // Add password bytes to digest
             md.update(password.getBytes());
-            // Get the hash's bytes
             byte[] bytes = md.digest();
-            // Convert byte array to hexadecimal format
             StringBuilder sb = new StringBuilder();
             for (byte aByte : bytes) {
                 sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
             }
-            // Get complete hashed password in hexadecimal format
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            // Return original password if encryption fails
             return password;
         }
     }
 }
-

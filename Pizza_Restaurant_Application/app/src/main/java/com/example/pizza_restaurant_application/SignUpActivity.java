@@ -3,7 +3,6 @@ package com.example.pizza_restaurant_application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -11,12 +10,15 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private EditText emailEditText, phoneEditText, firstNameEditText, lastNameEditText, passwordEditText, confirmPasswordEditText;
+    private EditText emailEditText;
+    private EditText phoneEditText;
+    private EditText firstNameEditText;
+    private EditText lastNameEditText;
+    private EditText passwordEditText;
+    private EditText confirmPasswordEditText;
     private Spinner genderSpinner;
     private DataBaseHelper dbHelper;
 
@@ -26,7 +28,6 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         dbHelper = new DataBaseHelper(this);
-
         emailEditText = findViewById(R.id.email_edit_text);
         phoneEditText = findViewById(R.id.phone_edit_text);
         firstNameEditText = findViewById(R.id.first_name_edit_text);

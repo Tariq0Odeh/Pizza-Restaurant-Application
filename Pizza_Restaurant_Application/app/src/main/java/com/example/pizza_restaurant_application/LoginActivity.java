@@ -1,3 +1,5 @@
+// LoginActivity.java
+
 package com.example.pizza_restaurant_application;
 
 import android.content.Intent;
@@ -30,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.password_edit_text);
         rememberMeCheckBox = findViewById(R.id.remember_me_checkbox);
         Button loginButton = findViewById(R.id.login_button);
+        Button signUpButton = findViewById(R.id.sign_up_button);
 
         sharedPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
         String savedEmail = sharedPreferences.getString(PREF_EMAIL_KEY, "");
@@ -39,6 +42,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 login();
+            }
+        });
+
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -62,7 +73,8 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             // Navigate to special menu or dashboard activity
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            Intent intent = new Intent(LoginActivity.this, CustomerHomeActivity.class);
+            intent.putExtra("email", email); // Pass email to ProfileFragment
             startActivity(intent);
             finish(); // Optional, to prevent user from navigating back to login screen
         } else {
@@ -70,4 +82,3 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 }
-

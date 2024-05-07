@@ -1,7 +1,6 @@
 package com.example.pizza_restaurant_application;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -15,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button getStarted = findViewById(R.id.button_get_started);
+        
 
         getStarted.setOnClickListener(new View.OnClickListener() {
             @Override

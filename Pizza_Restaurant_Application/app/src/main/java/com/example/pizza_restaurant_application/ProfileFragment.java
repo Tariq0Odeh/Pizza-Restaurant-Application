@@ -1,6 +1,10 @@
 package com.example.pizza_restaurant_application;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +13,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.squareup.picasso.Picasso;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ProfileFragment extends Fragment {
 
     private ImageView tvImage;
+    private Button btnImage;
     private EditText tvFirstName;
     private EditText tvLastName;
     private EditText tvPhone;
@@ -24,15 +37,16 @@ public class ProfileFragment extends Fragment {
     private Button btnUpdate;
     private Button btnNewPassword;
     private DataBaseHelper dbHelper;
+    private final int GALLERY_REQ_CODE = 1000;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         // Initialize views
-        tvImage = view.findViewById(R.id.imageView);
+        tvImage = view.findViewById(R.id.imageView_user);
+        btnImage = view.findViewById(R.id.button_change_picture);
         tvFirstName = view.findViewById(R.id.editText_first_name);
         tvLastName = view.findViewById(R.id.editText_last_name);
         tvPhone = view.findViewById(R.id.editText_phone);
@@ -49,60 +63,54 @@ public class ProfileFragment extends Fragment {
         // Fetch user information and update TextViews
         displayUserInfo();
 
-        // Set onClickListener for the update button
+        btnImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent iGallery = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                iGallery.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(iGallery, GALLERY_REQ_CODE);
+            }
+        });
+
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get the updated values from EditText fields
                 String firstName = tvFirstName.getText().toString().trim();
                 String lastName = tvLastName.getText().toString().trim();
                 String phone = tvPhone.getText().toString().trim();
                 String email = tvEmail.getText().toString().trim();
 
-                // Validate inputs
                 if (!validateInputs(email, phone, firstName, lastName)) {
                     return;
                 }
 
-                // Update user information
                 boolean updated = dbHelper.updateUserInfo(email, firstName, lastName, phone);
 
-                // Display a toast message indicating success or failure
                 if (updated) {
-                    // User information updated successfully
                     Toast.makeText(getActivity(), "User information updated successfully", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Failed to update user information
                     Toast.makeText(getActivity(), "Failed to update user information", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        // Set onClickListener for the new password button
         btnNewPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get the new password and confirm new password
                 String newPassword = etNewPassword.getText().toString().trim();
                 String confNewPassword = etConfNewPassword.getText().toString().trim();
 
-                // Validate inputs
                 if (!validatePassword(newPassword, confNewPassword)) {
                     return;
                 }
 
-                // Update user password
                 boolean updated = dbHelper.updateUserPassword(tvEmail.getText().toString().trim(), newPassword);
 
-                // Display a toast message indicating success or failure
                 if (updated) {
-                    // Password updated successfully
                     Toast.makeText(getActivity(), "Password updated successfully", Toast.LENGTH_SHORT).show();
-                    // Clear EditText fields
                     etNewPassword.setText("");
                     etConfNewPassword.setText("");
                 } else {
-                    // Failed to update password
                     Toast.makeText(getActivity(), "Failed to update password", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -111,13 +119,27 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == GALLERY_REQ_CODE && data != null) {
+                tvImage.setImageURI(data.getData());
+                System.out.println(data.getData());
+                boolean updated = dbHelper.updateUserProfilePicture(tvEmail.getText().toString().trim(), data.getData().toString());
+                if (updated) {
+                    Toast.makeText(getActivity(), "Profile picture updated successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Failed to update profile picture", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
     private void displayUserInfo() {
-        // Retrieve user information from the database
         User user = dbHelper.getUserByEmail();
 
-        // Check if user exists
         if (user != null) {
-            // Set user information in TextViews
             tvFirstName.setText(user.getFirstName());
             tvLastName.setText(user.getLastName());
             tvPhone.setText(user.getPhone());
@@ -125,10 +147,20 @@ public class ProfileFragment extends Fragment {
             tvEmail.setEnabled(false);
             tvGender.setText(user.getGender());
             tvGender.setEnabled(false);
+            if (user.getProfilePicture() == null) {
+                // Set a default image if profile picture is null
+                tvImage.setImageResource(R.drawable.user_icon);
+            } else {
+                // Set the user's profile picture
+               //tvImage.setImageResource(R.drawable.home);
+                System.out.println(user.getProfilePicture());
+                tvImage.setImageURI(user.getProfilePicture());
+            }
         } else {
-            // Handle the case where user does not exist
+            Toast.makeText(getActivity(), "User not found", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private boolean validateInputs(String email, String phone, String firstName, String lastName) {
         if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {

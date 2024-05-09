@@ -5,14 +5,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "UserDatabase";
-    private static final int DATABASE_VERSION = 4;
-
+    private static final int DATABASE_VERSION = 8;
     private static final String TABLE_USER = "user";
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_EMAIL = "email";
@@ -21,7 +24,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_LAST_NAME = "last_name";
     private static final String COLUMN_GENDER = "gender";
     private static final String COLUMN_PASSWORD_HASH = "password_hash";
-    private static final String COLUMN_PROFILE_PICTURE = "profile_picture"; // New column for profile picture
+    private static final String COLUMN_PROFILE_PICTURE = "profile_picture";
     private static String user_email = "";
 
     public DataBaseHelper(Context context) {
@@ -39,7 +42,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 COLUMN_LAST_NAME + " TEXT," +
                 COLUMN_GENDER + " TEXT," +
                 COLUMN_PASSWORD_HASH + " TEXT," +
-                COLUMN_PROFILE_PICTURE + " TEXT" + // New column for profile picture
+                COLUMN_PROFILE_PICTURE + " TEXT" +
                 ")";
         db.execSQL(CREATE_USER_TABLE);
     }
@@ -59,8 +62,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_LAST_NAME, user.getLastName());
         values.put(COLUMN_GENDER, user.getGender());
         values.put(COLUMN_PASSWORD_HASH, encryptPassword(user.getPassword()));
-            values.put(COLUMN_PROFILE_PICTURE, user.getProfilePicture());
-
+        Uri profilePictureUri = user.getProfilePicture();
+        if (profilePictureUri != null) {
+            values.put(COLUMN_PROFILE_PICTURE, profilePictureUri.toString());
+        } else {
+            values.putNull(COLUMN_PROFILE_PICTURE);
+        }
         long result = db.insert(TABLE_USER, null, values);
         db.close();
         return result != -1;
@@ -121,11 +128,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String phone = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE));
             String gender = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GENDER));
             String profilePicture = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PROFILE_PICTURE));
-            user = new User(user_email, phone, firstName, lastName, gender, null, profilePicture);
+            Uri uri = (profilePicture != null) ? Uri.parse(profilePicture) : null;
+            user = new User(user_email, phone, firstName, lastName, gender, null, uri);
         }
         cursor.close();
         return user;
     }
+
 
     public boolean updateUserInfo(String email, String firstName, String lastName, String phone) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -144,4 +153,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         int rowsAffected = db.update(TABLE_USER, values, COLUMN_EMAIL + "=?", new String[]{email});
         return rowsAffected > 0;
     }
+
+    public boolean updateUserProfilePicture(String email, String newProfilePicture) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PROFILE_PICTURE, newProfilePicture);
+        int rowsAffected = db.update(TABLE_USER, values, COLUMN_EMAIL + "=?", new String[]{email});
+        return rowsAffected > 0;
+    }
+
 }

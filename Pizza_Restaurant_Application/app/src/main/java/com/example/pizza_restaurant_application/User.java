@@ -1,5 +1,7 @@
 package com.example.pizza_restaurant_application;
 
+import android.net.Uri;
+
 public class User {
     private String email;
     private String phone;
@@ -7,9 +9,9 @@ public class User {
     private String lastName;
     private String gender;
     private String password;
-    private String profilePicture;
+    private Uri profilePicture;
 
-    public User(String email, String phone, String firstName, String lastName, String gender, String password, String profilePicture) {
+    public User(String email, String phone, String firstName, String lastName, String gender, String password, Uri profilePicture) {
         this.email = email;
         this.phone = phone;
         this.firstName = firstName;
@@ -67,11 +69,11 @@ public class User {
         this.password = password;
     }
 
-    public String getProfilePicture() {
+    public Uri getProfilePicture() {
         return profilePicture;
     }
 
-    public void setProfilePicture(String profilePicture) {
+    public void setProfilePicture(Uri profilePicture) {
         this.profilePicture = profilePicture;
     }
 

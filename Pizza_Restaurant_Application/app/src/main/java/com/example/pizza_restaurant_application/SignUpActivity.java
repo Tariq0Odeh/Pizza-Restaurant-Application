@@ -64,7 +64,7 @@ public class SignUpActivity extends AppCompatActivity {
                 String encryptedPassword = password;
 
                 // Insert user into database
-                User user = new User(email, phone, firstName, lastName, gender, encryptedPassword, "drawable://" + R.drawable.user_icon);
+                User user = new User(email, phone, firstName, lastName, gender, encryptedPassword, null);
                 boolean inserted = dbHelper.insertUser(user);
 
                 if (inserted) {

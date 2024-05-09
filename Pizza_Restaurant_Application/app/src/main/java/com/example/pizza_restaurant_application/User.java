@@ -7,18 +7,16 @@ public class User {
     private String lastName;
     private String gender;
     private String password;
+    private String profilePicture;
 
-    public User(){
-
-    }
-
-    public User(String email, String phone, String firstName, String lastName, String gender, String password) {
+    public User(String email, String phone, String firstName, String lastName, String gender, String password, String profilePicture) {
         this.email = email;
         this.phone = phone;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
         this.password = password;
+        this.profilePicture = profilePicture;
     }
 
     public String getEmail() {
@@ -69,6 +67,14 @@ public class User {
         this.password = password;
     }
 
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -78,6 +84,7 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", gender='" + gender + '\'' +
                 ", password='" + password + '\'' +
+                ", profilePicture='" + profilePicture + '\'' +
                 '}';
     }
 }

@@ -1,5 +1,3 @@
-// LoginActivity.java
-
 package com.example.pizza_restaurant_application;
 
 import android.content.Intent;
@@ -12,6 +10,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -72,11 +72,12 @@ public class LoginActivity extends AppCompatActivity {
                 sharedPreferences.edit().remove(PREF_EMAIL_KEY).apply();
             }
 
-            // Navigate to special menu or dashboard activity
-            Intent intent = new Intent(LoginActivity.this, CustomerHomeActivity.class);
-            intent.putExtra("email", email); // Pass email to ProfileFragment
-            startActivity(intent);
-            finish(); // Optional, to prevent user from navigating back to login screen
+            dbHelper.setUserEmail(email);
+
+            // Navigate to CustomerHomeActivity
+            Intent homeIntent = new Intent(LoginActivity.this, CustomerHomeActivity.class);
+            startActivity(homeIntent);
+            finish(); // Finish LoginActivity
         } else {
             Toast.makeText(LoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
         }

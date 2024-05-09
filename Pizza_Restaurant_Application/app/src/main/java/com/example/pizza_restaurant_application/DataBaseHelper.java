@@ -11,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "UserDatabase";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     private static final String TABLE_USER = "user";
     private static final String COLUMN_ID = "id";
@@ -21,6 +21,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_LAST_NAME = "last_name";
     private static final String COLUMN_GENDER = "gender";
     private static final String COLUMN_PASSWORD_HASH = "password_hash";
+    private static final String COLUMN_PROFILE_PICTURE = "profile_picture"; // New column for profile picture
+    private static String user_email = "";
 
     public DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -36,7 +38,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 COLUMN_FIRST_NAME + " TEXT," +
                 COLUMN_LAST_NAME + " TEXT," +
                 COLUMN_GENDER + " TEXT," +
-                COLUMN_PASSWORD_HASH + " TEXT" +
+                COLUMN_PASSWORD_HASH + " TEXT," +
+                COLUMN_PROFILE_PICTURE + " TEXT" + // New column for profile picture
                 ")";
         db.execSQL(CREATE_USER_TABLE);
     }
@@ -56,6 +59,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_LAST_NAME, user.getLastName());
         values.put(COLUMN_GENDER, user.getGender());
         values.put(COLUMN_PASSWORD_HASH, encryptPassword(user.getPassword()));
+            values.put(COLUMN_PROFILE_PICTURE, user.getProfilePicture());
+
         long result = db.insert(TABLE_USER, null, values);
         db.close();
         return result != -1;
@@ -100,5 +105,43 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
             return password;
         }
+    }
+
+    public void  setUserEmail(String email) {
+        user_email = email;
+    }
+
+    public User getUserByEmail() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + "=?", new String[]{user_email});
+        User user = null;
+        if (cursor.moveToFirst()) {
+            String firstName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME));
+            String lastName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME));
+            String phone = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE));
+            String gender = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GENDER));
+            String profilePicture = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PROFILE_PICTURE));
+            user = new User(user_email, phone, firstName, lastName, gender, null, profilePicture);
+        }
+        cursor.close();
+        return user;
+    }
+
+    public boolean updateUserInfo(String email, String firstName, String lastName, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_FIRST_NAME, firstName);
+        values.put(COLUMN_LAST_NAME, lastName);
+        values.put(COLUMN_PHONE, phone);
+        int rowsAffected = db.update(TABLE_USER, values, COLUMN_EMAIL + "=?", new String[]{email});
+        return rowsAffected > 0;
+    }
+
+    public boolean updateUserPassword(String email, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PASSWORD_HASH, encryptPassword(newPassword));
+        int rowsAffected = db.update(TABLE_USER, values, COLUMN_EMAIL + "=?", new String[]{email});
+        return rowsAffected > 0;
     }
 }

@@ -76,6 +76,8 @@ public class CustomerHomeActivity extends AppCompatActivity implements Navigatio
                 getSupportActionBar().setTitle("Special Offers");
                 break;
             case R.id.nav_profile:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new ProfileFragment()).commit();
                 getSupportActionBar().setTitle("Profile");
                 break;
             case R.id.nav_call_find_us:

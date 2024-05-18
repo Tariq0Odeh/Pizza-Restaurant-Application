@@ -10,8 +10,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -74,9 +72,17 @@ public class LoginActivity extends AppCompatActivity {
 
             dbHelper.setUserEmail(email);
 
-            // Navigate to CustomerHomeActivity
-            Intent homeIntent = new Intent(LoginActivity.this, CustomerHomeActivity.class);
-            startActivity(homeIntent);
+            // Fetch user details to check if the user is admin
+            User user = dbHelper.getUserByEmail();
+            if (user != null && user.isAdmin()) {
+                // Navigate to AdminHomeActivity
+                Intent homeIntent = new Intent(LoginActivity.this, AdminHomeActivity.class);
+                startActivity(homeIntent);
+            } else {
+                // Navigate to CustomerHomeActivity
+                Intent homeIntent = new Intent(LoginActivity.this, CustomerHomeActivity.class);
+                startActivity(homeIntent);
+            }
             finish(); // Finish LoginActivity
         } else {
             Toast.makeText(LoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();

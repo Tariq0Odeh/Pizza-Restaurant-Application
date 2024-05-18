@@ -1,17 +1,16 @@
 package com.example.pizza_restaurant_application;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Patterns;
+import androidx.fragment.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 
-public class SignUpActivity extends AppCompatActivity {
+public class AddAdminFragment extends Fragment {
 
     private EditText emailEditText;
     private EditText phoneEditText;
@@ -23,26 +22,28 @@ public class SignUpActivity extends AppCompatActivity {
     private DataBaseHelper dbHelper;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_add_admin, container, false);
+        dbHelper = new DataBaseHelper(getContext());
 
-        dbHelper = new DataBaseHelper(this);
-        emailEditText = findViewById(R.id.email_edit_text);
-        phoneEditText = findViewById(R.id.phone_edit_text);
-        firstNameEditText = findViewById(R.id.first_name_edit_text);
-        lastNameEditText = findViewById(R.id.last_name_edit_text);
-        genderSpinner = findViewById(R.id.gender_spinner);
-        passwordEditText = findViewById(R.id.password_edit_text);
-        confirmPasswordEditText = findViewById(R.id.confirm_password_edit_text);
+        emailEditText = rootView.findViewById(R.id.email_edit_text);
+        phoneEditText = rootView.findViewById(R.id.phone_edit_text);
+        firstNameEditText = rootView.findViewById(R.id.first_name_edit_text);
+        lastNameEditText = rootView.findViewById(R.id.last_name_edit_text);
+        genderSpinner = rootView.findViewById(R.id.gender_spinner);
+        passwordEditText = rootView.findViewById(R.id.password_edit_text);
+        confirmPasswordEditText = rootView.findViewById(R.id.confirm_password_edit_text);
 
-        Button signUpButton = findViewById(R.id.sign_up_button);
+        Button signUpButton = rootView.findViewById(R.id.sign_up_button);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signUp();
             }
         });
+
+        return rootView;
     }
 
     private void signUp() {
@@ -56,56 +57,60 @@ public class SignUpActivity extends AppCompatActivity {
 
         if (validateInputs(email, phone, firstName, lastName, password, confirmPassword)) {
             if (dbHelper.checkEmailExists(email)) {
-                Toast.makeText(SignUpActivity.this, "Email already exists", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Email already exists", Toast.LENGTH_SHORT).show();
             } else if (dbHelper.checkPhoneExists(phone)) {
-                Toast.makeText(SignUpActivity.this, "Phone number already exists", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Phone number already exists", Toast.LENGTH_SHORT).show();
             } else {
-                // Encrypt password
+                // Encrypt password (if needed)
                 String encryptedPassword = password;
 
                 // Insert user into database
-                User user = new User(email, phone, firstName, lastName, gender, encryptedPassword, null, false);
+                User user = new User(email, phone, firstName, lastName, gender, encryptedPassword, null, true);
                 boolean inserted = dbHelper.insertUser(user);
 
                 if (inserted) {
-                    Toast.makeText(SignUpActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+                    Toast.makeText(getContext(), "User registered successfully", Toast.LENGTH_SHORT).show();
+                    // Clear input fields after successful registration if needed
+                    emailEditText.setText("");
+                    phoneEditText.setText("");
+                    firstNameEditText.setText("");
+                    lastNameEditText.setText("");
+                    passwordEditText.setText("");
+                    confirmPasswordEditText.setText("");
                 } else {
-                    Toast.makeText(SignUpActivity.this, "Failed to register user", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to register user", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
 
     private boolean validateInputs(String email, String phone, String firstName, String lastName, String password, String confirmPassword) {
-        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Enter a valid email address");
             return false;
         }
 
-        if (TextUtils.isEmpty(phone) || !phone.startsWith("05") || phone.length() != 10) {
+        if (phone.isEmpty() || !phone.startsWith("05") || phone.length() != 10) {
             phoneEditText.setError("Enter a valid phone number starting with '05' and 10 digits");
             return false;
         }
 
-        if (TextUtils.isEmpty(firstName) || firstName.length() < 3) {
+        if (firstName.isEmpty() || firstName.length() < 3) {
             firstNameEditText.setError("Enter a valid first name (at least 3 characters)");
             return false;
         }
 
-        if (TextUtils.isEmpty(lastName) || lastName.length() < 3) {
+        if (lastName.isEmpty() || lastName.length() < 3) {
             lastNameEditText.setError("Enter a valid last name (at least 3 characters)");
             return false;
         }
 
-        if (TextUtils.isEmpty(password) || password.length() < 8 || !password.matches(".*\\d.*") || !password.matches(".*[a-zA-Z].*")) {
+        if (password.isEmpty() || password.length() < 8 || !password.matches(".*\\d.*") || !password.matches(".*[a-zA-Z].*")) {
             passwordEditText.setError("Password must be at least 8 characters long and contain at least one letter and one number");
             return false;
         }
 
-        if (!TextUtils.equals(password, confirmPassword)) {
+        if (!password.equals(confirmPassword)) {
             confirmPasswordEditText.setError("Passwords do not match");
             return false;
         }

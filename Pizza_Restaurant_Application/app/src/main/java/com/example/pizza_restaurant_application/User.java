@@ -10,8 +10,9 @@ public class User {
     private String gender;
     private String password;
     private Uri profilePicture;
+    private boolean isAdmin;
 
-    public User(String email, String phone, String firstName, String lastName, String gender, String password, Uri profilePicture) {
+    public User(String email, String phone, String firstName, String lastName, String gender, String password, Uri profilePicture, boolean isAdmin) {
         this.email = email;
         this.phone = phone;
         this.firstName = firstName;
@@ -19,8 +20,10 @@ public class User {
         this.gender = gender;
         this.password = password;
         this.profilePicture = profilePicture;
+        this.isAdmin = isAdmin;
     }
 
+    // Getters and setters
     public String getEmail() {
         return email;
     }
@@ -77,6 +80,14 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -87,6 +98,7 @@ public class User {
                 ", gender='" + gender + '\'' +
                 ", password='" + password + '\'' +
                 ", profilePicture='" + profilePicture + '\'' +
+                ", isAdmin=" + isAdmin +
                 '}';
     }
 }

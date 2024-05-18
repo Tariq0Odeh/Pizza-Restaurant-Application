@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "UserDatabase";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
     private static final String TABLE_USER = "user";
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_EMAIL = "email";
@@ -25,6 +25,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_GENDER = "gender";
     private static final String COLUMN_PASSWORD_HASH = "password_hash";
     private static final String COLUMN_PROFILE_PICTURE = "profile_picture";
+    private static final String COLUMN_IS_ADMIN = "is_admin";
     private static String user_email = "";
 
     public DataBaseHelper(Context context) {
@@ -42,7 +43,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 COLUMN_LAST_NAME + " TEXT," +
                 COLUMN_GENDER + " TEXT," +
                 COLUMN_PASSWORD_HASH + " TEXT," +
-                COLUMN_PROFILE_PICTURE + " TEXT" +
+                COLUMN_PROFILE_PICTURE + " TEXT," +
+                COLUMN_IS_ADMIN + " INTEGER" +
                 ")";
         db.execSQL(CREATE_USER_TABLE);
     }
@@ -62,6 +64,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_LAST_NAME, user.getLastName());
         values.put(COLUMN_GENDER, user.getGender());
         values.put(COLUMN_PASSWORD_HASH, encryptPassword(user.getPassword()));
+        values.put(COLUMN_IS_ADMIN, user.isAdmin() ? 1 : 0);
         Uri profilePictureUri = user.getProfilePicture();
         if (profilePictureUri != null) {
             values.put(COLUMN_PROFILE_PICTURE, profilePictureUri.toString());
@@ -128,8 +131,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String phone = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE));
             String gender = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GENDER));
             String profilePicture = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PROFILE_PICTURE));
+            int isAdminInt = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_ADMIN));
+            boolean isAdmin = (isAdminInt == 1);
             Uri uri = (profilePicture != null) ? Uri.parse(profilePicture) : null;
-            user = new User(user_email, phone, firstName, lastName, gender, null, uri);
+            user = new User(user_email, phone, firstName, lastName, gender, null, uri, isAdmin);
         }
         cursor.close();
         return user;
@@ -162,4 +167,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
+    public void insertAdminUser() {
+        User adminUser = new User(
+                "t@gmail.com",
+                "0509876543",
+                "tariq",
+                "odeh",
+                "male",
+                "ttpp1100",
+                null,
+                true
+        );
+        insertUser(adminUser);
+    }
 }

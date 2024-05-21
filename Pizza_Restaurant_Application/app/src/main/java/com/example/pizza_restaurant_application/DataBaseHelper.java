@@ -11,12 +11,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "UserDatabase";
-    private static final int DATABASE_VERSION = 9;
+    private static final String DATABASE_NAME = "PizzaDatabase";
+    private static final int DATABASE_VERSION = 1;
+
     private static final String TABLE_USER = "user";
+    private static final String TABLE_PIZZA = "pizza";
+
+
+    // User table columns
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_EMAIL = "email";
     private static final String COLUMN_PHONE = "phone";
@@ -26,7 +33,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PASSWORD_HASH = "password_hash";
     private static final String COLUMN_PROFILE_PICTURE = "profile_picture";
     private static final String COLUMN_IS_ADMIN = "is_admin";
+
+    // Pizza table columns
+    private static final String COLUMN_PIZZA_NAME = "name";
+    private static final String COLUMN_PIZZA_CATEGORY = "category";
+    private static final String COLUMN_PIZZA_DESCRIPTION = "description";
+    private static final String COLUMN_PIZZA_SMALL_PRICE = "small_price";
+    private static final String COLUMN_PIZZA_MEDIUM_PRICE = "medium_price";
+    private static final String COLUMN_PIZZA_LARGE_PRICE = "large_price";
+
     private static String user_email = "";
+
 
     public DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -47,11 +64,24 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 COLUMN_IS_ADMIN + " INTEGER" +
                 ")";
         db.execSQL(CREATE_USER_TABLE);
+
+        String CREATE_PIZZA_TABLE = "CREATE TABLE " + TABLE_PIZZA +
+                "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_PIZZA_NAME + " TEXT," +
+                COLUMN_PIZZA_CATEGORY + " TEXT," +
+                COLUMN_PIZZA_DESCRIPTION + " TEXT," +
+                COLUMN_PIZZA_SMALL_PRICE + " REAL," +
+                COLUMN_PIZZA_MEDIUM_PRICE + " REAL," +
+                COLUMN_PIZZA_LARGE_PRICE + " REAL" +
+                ")";
+        db.execSQL(CREATE_PIZZA_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PIZZA);
         onCreate(db);
     }
 
@@ -72,6 +102,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             values.putNull(COLUMN_PROFILE_PICTURE);
         }
         long result = db.insert(TABLE_USER, null, values);
+        db.close();
+        return result != -1;
+    }
+
+    public boolean insertPizza(Pizza pizza) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PIZZA_NAME, pizza.getName());
+        values.put(COLUMN_PIZZA_CATEGORY, pizza.getCategory());
+        values.put(COLUMN_PIZZA_DESCRIPTION, pizza.getDescription());
+        values.put(COLUMN_PIZZA_SMALL_PRICE, pizza.getSmallPrice());
+        values.put(COLUMN_PIZZA_MEDIUM_PRICE, pizza.getMediumPrice());
+        values.put(COLUMN_PIZZA_LARGE_PRICE, pizza.getLargePrice());
+        long result = db.insert(TABLE_PIZZA, null, values);
         db.close();
         return result != -1;
     }
@@ -180,4 +224,35 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         );
         insertUser(adminUser);
     }
+
+    // ++++++++++++++++++++++++++++++++++++++++++++
+
+    public List<Pizza> getAllPizzas() {
+        List<Pizza> pizzas = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_PIZZA, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_CATEGORY));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_DESCRIPTION));
+                double smallPrice = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_SMALL_PRICE));
+                double mediumPrice = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_MEDIUM_PRICE));
+                double largePrice = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_LARGE_PRICE));
+
+                Pizza pizza = new Pizza();
+                pizza.setName(name);
+                pizza.setCategory(category);
+                pizza.setDescription(description);
+                pizza.setSmallPrice(smallPrice);
+                pizza.setMediumPrice(mediumPrice);
+                pizza.setLargePrice(largePrice);
+
+                pizzas.add(pizza);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return pizzas;
+    }
+
 }

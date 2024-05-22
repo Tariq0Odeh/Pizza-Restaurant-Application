@@ -63,6 +63,11 @@ public class PizzaDetailFragment extends Fragment {
 
             // Check if pizza is already in favorites
             isFavorite = checkIfPizzaIsFavorite();
+            if (isFavorite) {
+                addToFavoritesButton.setBackgroundResource(R.drawable.heart_filled);
+            } else {
+                addToFavoritesButton.setBackgroundResource(R.drawable.heart_shape);
+            }
 
             addToFavoritesButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -75,7 +80,11 @@ public class PizzaDetailFragment extends Fragment {
                         showToast("Added to favorites");
                     }
                     isFavorite = !isFavorite;
-                    updateFavoritesButton();
+                    if (isFavorite) {
+                        addToFavoritesButton.setBackgroundResource(R.drawable.heart_filled);
+                    } else {
+                        addToFavoritesButton.setBackgroundResource(R.drawable.heart_shape);
+                    }
                 }
             });
         }
@@ -113,15 +122,6 @@ public class PizzaDetailFragment extends Fragment {
         }
     }
 
-    private void updateFavoritesButton() {
-        Button addToFavoritesButton = getView().findViewById(R.id.addToFavoritesButton);
-        if (isFavorite) {
-            addToFavoritesButton.setBackgroundResource(R.drawable.heart_filled);
-        } else {
-            addToFavoritesButton.setBackgroundResource(R.drawable.heart_shape);
-        }
-    }
-
     private void showToast(String message) {
         Context context = getContext();
         if (context != null) {
@@ -130,12 +130,46 @@ public class PizzaDetailFragment extends Fragment {
     }
 
     private void loadImage(String pizzaName, ImageView imageView) {
-        // Load image based on pizza name
-        switch (pizzaName) {
+        switch (pizza.getName()) {
             case "Margherita Pizza":
                 imageView.setImageResource(R.drawable.margarita);
                 break;
-            // Add cases for other pizza names and their respective images
+            case "Neapolitan Pizza":
+                imageView.setImageResource(R.drawable.neapolitan);
+                break;
+            case "Hawaiian Pizza":
+                imageView.setImageResource(R.drawable.hawaiian);
+                break;
+            case "Pepperoni Pizza":
+                imageView.setImageResource(R.drawable.pepperoni);
+                break;
+            case "New York Style Pizza":
+                imageView.setImageResource(R.drawable.new_york_style);
+                break;
+            case "Calzone":
+                imageView.setImageResource(R.drawable.calzone);
+                break;
+            case "Tandoori Chicken Pizza":
+                imageView.setImageResource(R.drawable.tandoori_chicken);
+                break;
+            case "BBQ Chicken Pizza":
+                imageView.setImageResource(R.drawable.bbq_chicken);
+                break;
+            case "Seafood Pizza":
+                imageView.setImageResource(R.drawable.seafood);
+                break;
+            case "Vegetarian Pizza":
+                imageView.setImageResource(R.drawable.vegetarian);
+                break;
+            case "Buffalo Chicken Pizza":
+                imageView.setImageResource(R.drawable.buffalo_chicken);
+                break;
+            case "Mushroom Truffle Pizza":
+                imageView.setImageResource(R.drawable.mushroom_truffle);
+                break;
+            case "Pesto Chicken Pizza":
+                imageView.setImageResource(R.drawable.pesto_chicken);
+                break;
             default:
                 imageView.setImageResource(R.drawable.pizza_icon);
                 break;

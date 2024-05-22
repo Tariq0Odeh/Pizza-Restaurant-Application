@@ -119,33 +119,56 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    // Method to clear pizza table
-    public void clearPizzaTable() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DELETE FROM " + TABLE_PIZZA);
+   //+++++++++++++++++++++++++++++++++++++++++++++++++
+
+    // Method to check if a pizza exists in the database
+    public boolean pizzaExists(String pizzaName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_PIZZA, new String[]{COLUMN_PIZZA_NAME},
+                COLUMN_PIZZA_NAME + " = ?", new String[]{pizzaName},
+                null, null, null);
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
         db.close();
+        return exists;
     }
 
-    // Method to insert a pizza and clear the table if needed
-    public boolean insertPizza(Pizza pizza) {
-        if (!clearTableFlag) {
-            clearPizzaTable();
-            clearTableFlag = true;
-        }
-
+    // Method to update an existing pizza
+    public boolean updatePizza(Pizza pizza) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_PIZZA_NAME, pizza.getName());
         values.put(COLUMN_PIZZA_CATEGORY, pizza.getCategory());
         values.put(COLUMN_PIZZA_DESCRIPTION, pizza.getDescription());
         values.put(COLUMN_PIZZA_SMALL_PRICE, pizza.getSmallPrice());
         values.put(COLUMN_PIZZA_MEDIUM_PRICE, pizza.getMediumPrice());
         values.put(COLUMN_PIZZA_LARGE_PRICE, pizza.getLargePrice());
-        long result = db.insert(TABLE_PIZZA, null, values);
+        int rowsAffected = db.update(TABLE_PIZZA, values,
+                COLUMN_PIZZA_NAME + " = ?", new String[]{pizza.getName()});
         db.close();
-        return result != -1;
+        return rowsAffected > 0;
     }
 
+
+    // Method to insert or update a pizza
+    public boolean insertPizza(Pizza pizza) {
+        if (pizzaExists(pizza.getName())) {
+            return updatePizza(pizza);
+        } else {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_PIZZA_NAME, pizza.getName());
+            values.put(COLUMN_PIZZA_CATEGORY, pizza.getCategory());
+            values.put(COLUMN_PIZZA_DESCRIPTION, pizza.getDescription());
+            values.put(COLUMN_PIZZA_SMALL_PRICE, pizza.getSmallPrice());
+            values.put(COLUMN_PIZZA_MEDIUM_PRICE, pizza.getMediumPrice());
+            values.put(COLUMN_PIZZA_LARGE_PRICE, pizza.getLargePrice());
+            long result = db.insert(TABLE_PIZZA, null, values);
+            db.close();
+            return result != -1;
+        }
+    }
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++
 
     public boolean checkEmailExists(String email) {
         SQLiteDatabase db = this.getReadableDatabase();

@@ -69,7 +69,8 @@ public class CustomerHomeActivity extends AppCompatActivity implements Navigatio
                 getSupportActionBar().setTitle("Your Orders");
                 break;
             case R.id.nav_favorites:
-                // Handle Favorites click
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new FavoritesFragment()).commit();
                 getSupportActionBar().setTitle("Your Favorites");
                 break;
             case R.id.nav_special_offers:

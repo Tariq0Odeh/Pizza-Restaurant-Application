@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="gender_options">
-        <item>Male</item>
-        <item>Female</item>
-    </string-array>
+
+<string-array name="gender_options">
+    <item>Male</item>
+    <item>Female</item>
+</string-array>
+
+<string-array name="price_ranges">
+    <item>Any Price</item>
+    <item>Under $10</item>
+    <item>$10 - $15</item>
+    <item>Above $15</item>
+</string-array>
+
+<string-array name="sizes">
+    <item>Any Size</item>
+    <item>Small</item>
+    <item>Medium</item>
+    <item>Large</item>
+</string-array>
+
+<string-array name="categories">
+    <item>Any Category</item>
+    <item>Chicken</item>
+    <item>Beef</item>
+    <item>Veggies</item>
+    <item>Others</item>
+
+</string-array>
 </resources>

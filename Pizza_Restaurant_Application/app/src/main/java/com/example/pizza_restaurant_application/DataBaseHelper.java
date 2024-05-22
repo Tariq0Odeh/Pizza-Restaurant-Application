@@ -6,9 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -17,7 +14,7 @@ import java.util.List;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "PizzaDatabase";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     private static final String TABLE_USER = "user";
     private static final String TABLE_PIZZA = "pizza";
@@ -41,6 +38,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PIZZA_SMALL_PRICE = "small_price";
     private static final String COLUMN_PIZZA_MEDIUM_PRICE = "medium_price";
     private static final String COLUMN_PIZZA_LARGE_PRICE = "large_price";
+
+    private static final String TABLE_FAVORITES = "favorites";
+    private static final String COLUMN_FAVORITE_ID = "favorite_id";
+    private static final String COLUMN_USER_EMAIL = "user_email";
+
 
     private static String user_email = "";
     private boolean clearTableFlag = false;
@@ -77,6 +79,16 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 COLUMN_PIZZA_LARGE_PRICE + " REAL" +
                 ")";
         db.execSQL(CREATE_PIZZA_TABLE);
+
+        String CREATE_FAVORITES_TABLE = "CREATE TABLE " + TABLE_FAVORITES +
+                "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_USER_EMAIL + " TEXT," +
+                COLUMN_FAVORITE_ID + " INTEGER," +
+                "FOREIGN KEY(" + COLUMN_USER_EMAIL + ") REFERENCES " + TABLE_USER + "(" + COLUMN_EMAIL + ")," +
+                "FOREIGN KEY(" + COLUMN_FAVORITE_ID + ") REFERENCES " + TABLE_PIZZA + "(" + COLUMN_ID + ")" +
+                ")";
+        db.execSQL(CREATE_FAVORITES_TABLE);
     }
 
     @Override
@@ -266,6 +278,77 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return pizzas;
+    }
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    // Method to add a favorite pizza for a user
+    public boolean addFavoritePizza(int pizzaId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_EMAIL, user_email);
+        values.put(COLUMN_FAVORITE_ID, pizzaId);
+        long result = db.insert(TABLE_FAVORITES, null, values);
+        db.close();
+        return result != -1;
+    }
+
+    // Method to remove a favorite pizza for a user
+    public boolean removeFavoritePizza(int pizzaId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.delete(TABLE_FAVORITES, COLUMN_USER_EMAIL + " = ? AND " + COLUMN_FAVORITE_ID + " = ?",
+                new String[]{user_email, String.valueOf(pizzaId)});
+        db.close();
+        return result > 0;
+    }
+
+    // Method to get all favorite pizzas for a user
+    public List<Pizza> getFavoritePizzas() {
+        List<Pizza> favoritePizzas = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_PIZZA + " INNER JOIN " + TABLE_FAVORITES +
+                " ON " + TABLE_PIZZA + "." + COLUMN_ID + " = " + TABLE_FAVORITES + "." + COLUMN_FAVORITE_ID +
+                " WHERE " + TABLE_FAVORITES + "." + COLUMN_USER_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{user_email});
+        if (cursor.moveToFirst()) {
+            do {
+                // Retrieve pizza details from cursor
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_CATEGORY));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_DESCRIPTION));
+                double smallPrice = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_SMALL_PRICE));
+                double mediumPrice = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_MEDIUM_PRICE));
+                double largePrice = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_LARGE_PRICE));
+
+                // Create Pizza object and add it to the list
+                Pizza pizza = new Pizza();
+                pizza.setName(name);
+                pizza.setCategory(category);
+                pizza.setDescription(description);
+                pizza.setSmallPrice(smallPrice);
+                pizza.setMediumPrice(mediumPrice);
+                pizza.setLargePrice(largePrice);
+                favoritePizzas.add(pizza);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return favoritePizzas;
+    }
+
+    public int getPizzaIdByName(String pizzaName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int pizzaId = -1; // Default value if pizza ID is not found
+        Cursor cursor = db.query(TABLE_PIZZA,
+                new String[]{COLUMN_ID},
+                COLUMN_PIZZA_NAME + "=?",
+                new String[]{pizzaName},
+                null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            // If cursor is not null and contains at least one row, extract the pizza ID
+            pizzaId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+            cursor.close();
+        }
+        return pizzaId;
     }
 
 }

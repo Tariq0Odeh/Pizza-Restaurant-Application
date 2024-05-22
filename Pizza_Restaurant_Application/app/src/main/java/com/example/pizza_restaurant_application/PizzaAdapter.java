@@ -7,11 +7,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import java.util.List;
+
 public class PizzaAdapter extends RecyclerView.Adapter<PizzaAdapter.PizzaViewHolder> {
     private List<Pizza> pizzaList;
+    private List<Pizza> filteredList; // New filtered list
     private OnPizzaClickListener listener;
 
     public interface OnPizzaClickListener {
@@ -20,6 +33,7 @@ public class PizzaAdapter extends RecyclerView.Adapter<PizzaAdapter.PizzaViewHol
 
     public PizzaAdapter(List<Pizza> pizzaList, OnPizzaClickListener listener) {
         this.pizzaList = pizzaList;
+        this.filteredList = new ArrayList<>(pizzaList); // Initialize filteredList with all pizzas
         this.listener = listener;
     }
 
@@ -32,14 +46,14 @@ public class PizzaAdapter extends RecyclerView.Adapter<PizzaAdapter.PizzaViewHol
 
     @Override
     public void onBindViewHolder(@NonNull PizzaViewHolder holder, int position) {
-        Pizza pizza = pizzaList.get(position);
+        Pizza pizza = filteredList.get(position); // Use filtered list instead of original list
         holder.bind(pizza);
         holder.itemView.setOnClickListener(v -> listener.onPizzaClick(pizza));
     }
 
     @Override
     public int getItemCount() {
-        return pizzaList.size();
+        return filteredList.size(); // Return size of filtered list
     }
 
     class PizzaViewHolder extends RecyclerView.ViewHolder {
@@ -54,7 +68,8 @@ public class PizzaAdapter extends RecyclerView.Adapter<PizzaAdapter.PizzaViewHol
 
         public void bind(Pizza pizza) {
             nameTextView.setText(pizza.getName());
-
+            // Set image resource based on pizza's name
+            // Note: You may consider using pizza.getImageResourceId() if you have image resource IDs in the Pizza model
             switch (pizza.getName()) {
                 case "Margherita Pizza":
                     imageView.setImageResource(R.drawable.margarita);
@@ -101,5 +116,10 @@ public class PizzaAdapter extends RecyclerView.Adapter<PizzaAdapter.PizzaViewHol
             }
         }
     }
-}
 
+    // Method to filter the pizza list
+    public void filterList(List<Pizza> filteredList) {
+        this.filteredList = filteredList;
+        notifyDataSetChanged(); // Notify adapter that the dataset has changed
+    }
+}

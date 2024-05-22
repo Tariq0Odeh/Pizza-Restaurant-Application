@@ -1,21 +1,26 @@
 package com.example.pizza_restaurant_application;
 
-
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.List;
 
 public class PizzaDetailFragment extends Fragment {
     private static final String ARG_PIZZA = "pizza";
     private Pizza pizza;
+    private boolean isFavorite = false;
+    private DataBaseHelper dbHelper;
 
     public static PizzaDetailFragment newInstance(Pizza pizza) {
         PizzaDetailFragment fragment = new PizzaDetailFragment();
@@ -30,6 +35,8 @@ public class PizzaDetailFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pizza_detail, container, false);
 
+        dbHelper = new DataBaseHelper(getContext());
+
         if (getArguments() != null) {
             pizza = (Pizza) getArguments().getSerializable(ARG_PIZZA);
         }
@@ -41,6 +48,7 @@ public class PizzaDetailFragment extends Fragment {
         TextView mediumPriceTextView = view.findViewById(R.id.mediumPriceTextView);
         TextView largePriceTextView = view.findViewById(R.id.largePriceTextView);
         ImageView imageView = view.findViewById(R.id.imageView);
+        Button addToFavoritesButton = view.findViewById(R.id.addToFavoritesButton);
 
         if (pizza != null) {
             nameTextView.setText(pizza.getName());
@@ -50,53 +58,87 @@ public class PizzaDetailFragment extends Fragment {
             mediumPriceTextView.setText(String.format("Medium: $%.2f", pizza.getMediumPrice()));
             largePriceTextView.setText(String.format("Large: $%.2f", pizza.getLargePrice()));
 
-            switch (pizza.getName()) {
-                case "Margherita Pizza":
-                    imageView.setImageResource(R.drawable.margarita);
-                    break;
-                case "Neapolitan Pizza":
-                    imageView.setImageResource(R.drawable.neapolitan);
-                    break;
-                case "Hawaiian Pizza":
-                    imageView.setImageResource(R.drawable.hawaiian);
-                    break;
-                case "Pepperoni Pizza":
-                    imageView.setImageResource(R.drawable.pepperoni);
-                    break;
-                case "New York Style Pizza":
-                    imageView.setImageResource(R.drawable.new_york_style);
-                    break;
-                case "Calzone":
-                    imageView.setImageResource(R.drawable.calzone);
-                    break;
-                case "Tandoori Chicken Pizza":
-                    imageView.setImageResource(R.drawable.tandoori_chicken);
-                    break;
-                case "BBQ Chicken Pizza":
-                    imageView.setImageResource(R.drawable.bbq_chicken);
-                    break;
-                case "Seafood Pizza":
-                    imageView.setImageResource(R.drawable.seafood);
-                    break;
-                case "Vegetarian Pizza":
-                    imageView.setImageResource(R.drawable.vegetarian);
-                    break;
-                case "Buffalo Chicken Pizza":
-                    imageView.setImageResource(R.drawable.buffalo_chicken);
-                    break;
-                case "Mushroom Truffle Pizza":
-                    imageView.setImageResource(R.drawable.mushroom_truffle);
-                    break;
-                case "Pesto Chicken Pizza":
-                    imageView.setImageResource(R.drawable.pesto_chicken);
-                    break;
-                default:
-                    imageView.setImageResource(R.drawable.pizza_icon);
-                    break;
-            }
+            // Load image based on pizza name
+            loadImage(pizza.getName(), imageView);
+
+            // Check if pizza is already in favorites
+            isFavorite = checkIfPizzaIsFavorite();
+
+            addToFavoritesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isFavorite) {
+                        removePizzaFromFavorites();
+                        showToast("Removed from favorites");
+                    } else {
+                        addPizzaToFavorites();
+                        showToast("Added to favorites");
+                    }
+                    isFavorite = !isFavorite;
+                    updateFavoritesButton();
+                }
+            });
         }
 
         return view;
     }
-}
 
+    private boolean checkIfPizzaIsFavorite() {
+        List<Pizza> favoritePizzas = dbHelper.getFavoritePizzas();
+        for (Pizza favPizza : favoritePizzas) {
+            if (favPizza.getName().equals(pizza.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void addPizzaToFavorites() {
+        List<Pizza> favoritePizzas = dbHelper.getFavoritePizzas();
+        if (!favoritePizzas.contains(pizza)) {
+            boolean result = dbHelper.addFavoritePizza(dbHelper.getPizzaIdByName(pizza.getName()));
+            if (!result) {
+                showToast("Failed to add to favorites");
+            }
+        }
+    }
+
+    private void removePizzaFromFavorites() {
+        List<Pizza> favoritePizzas = dbHelper.getFavoritePizzas();
+        if (favoritePizzas.contains(pizza)) {
+            boolean result = dbHelper.removeFavoritePizza(dbHelper.getPizzaIdByName(pizza.getName()));
+            if (!result) {
+                showToast("Failed to remove from favorites");
+            }
+        }
+    }
+
+    private void updateFavoritesButton() {
+        Button addToFavoritesButton = getView().findViewById(R.id.addToFavoritesButton);
+        if (isFavorite) {
+            addToFavoritesButton.setBackgroundResource(R.drawable.heart_filled);
+        } else {
+            addToFavoritesButton.setBackgroundResource(R.drawable.heart_shape);
+        }
+    }
+
+    private void showToast(String message) {
+        Context context = getContext();
+        if (context != null) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadImage(String pizzaName, ImageView imageView) {
+        // Load image based on pizza name
+        switch (pizzaName) {
+            case "Margherita Pizza":
+                imageView.setImageResource(R.drawable.margarita);
+                break;
+            // Add cases for other pizza names and their respective images
+            default:
+                imageView.setImageResource(R.drawable.pizza_icon);
+                break;
+        }
+    }
+}

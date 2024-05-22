@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new DataBaseHelper(this);
         dbHelper.insertAdminUser();
-        
+
         button = findViewById(R.id.button_get_started);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -17,7 +17,7 @@ import java.util.List;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "PizzaDatabase";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 7;
 
     private static final String TABLE_USER = "user";
     private static final String TABLE_PIZZA = "pizza";
@@ -43,6 +43,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PIZZA_LARGE_PRICE = "large_price";
 
     private static String user_email = "";
+    private boolean clearTableFlag = false;
 
 
     public DataBaseHelper(Context context) {
@@ -106,7 +107,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
+    // Method to clear pizza table
+    public void clearPizzaTable() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_PIZZA);
+        db.close();
+    }
+
+    // Method to insert a pizza and clear the table if needed
     public boolean insertPizza(Pizza pizza) {
+        if (!clearTableFlag) {
+            clearPizzaTable();
+            clearTableFlag = true;
+        }
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_PIZZA_NAME, pizza.getName());
@@ -119,6 +133,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.close();
         return result != -1;
     }
+
 
     public boolean checkEmailExists(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -224,8 +239,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         );
         insertUser(adminUser);
     }
-
-    // ++++++++++++++++++++++++++++++++++++++++++++
 
     public List<Pizza> getAllPizzas() {
         List<Pizza> pizzas = new ArrayList<>();

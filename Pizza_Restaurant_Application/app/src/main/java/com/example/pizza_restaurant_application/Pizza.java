@@ -1,6 +1,8 @@
 package com.example.pizza_restaurant_application;
 
-public class Pizza {
+import java.io.Serializable;
+
+public class Pizza implements Serializable {
     private String name;
     private String category;
     private String description;
@@ -57,6 +59,7 @@ public class Pizza {
     public void setLargePrice(double largePrice) {
         this.largePrice = largePrice;
     }
+
 
     @Override
     public String toString() {

@@ -12,15 +12,11 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private Button button;
-    private DataBaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        dbHelper = new DataBaseHelper(this);
-        dbHelper.insertAdminUser();
 
         button = findViewById(R.id.button_get_started);
         button.setOnClickListener(new View.OnClickListener() {

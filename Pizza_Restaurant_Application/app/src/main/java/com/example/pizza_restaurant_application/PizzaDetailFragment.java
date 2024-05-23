@@ -1,12 +1,17 @@
 package com.example.pizza_restaurant_application;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,7 +19,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class PizzaDetailFragment extends Fragment {
     private static final String ARG_PIZZA = "pizza";
@@ -49,6 +57,8 @@ public class PizzaDetailFragment extends Fragment {
         TextView largePriceTextView = view.findViewById(R.id.largePriceTextView);
         ImageView imageView = view.findViewById(R.id.imageView);
         Button addToFavoritesButton = view.findViewById(R.id.addToFavoritesButton);
+        Button orderButton = view.findViewById(R.id.orderButton);
+        Button submitOrderButton = view.findViewById(R.id.submitOrderButton);
 
         if (pizza != null) {
             nameTextView.setText(pizza.getName());
@@ -58,10 +68,8 @@ public class PizzaDetailFragment extends Fragment {
             mediumPriceTextView.setText(String.format("Medium: $%.2f", pizza.getMediumPrice()));
             largePriceTextView.setText(String.format("Large: $%.2f", pizza.getLargePrice()));
 
-            // Load image based on pizza name
             loadImage(pizza.getName(), imageView);
 
-            // Check if pizza is already in favorites
             isFavorite = checkIfPizzaIsFavorite();
             if (isFavorite) {
                 addToFavoritesButton.setBackgroundResource(R.drawable.heart_filled);
@@ -85,6 +93,15 @@ public class PizzaDetailFragment extends Fragment {
                     } else {
                         addToFavoritesButton.setBackgroundResource(R.drawable.heart_shape);
                     }
+                }
+            });
+
+
+
+            orderButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showOrderDialog();
                 }
             });
         }
@@ -175,4 +192,120 @@ public class PizzaDetailFragment extends Fragment {
                 break;
         }
     }
+
+    private void showOrderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_order, null);
+        builder.setView(dialogView);
+
+        TextView orderPizzaNameTextView = dialogView.findViewById(R.id.orderPizzaNameTextView);
+        Spinner sizeSpinner = dialogView.findViewById(R.id.sizeSpinner);
+        TextView priceTextView = dialogView.findViewById(R.id.priceTextView);
+        EditText quantityEditText = dialogView.findViewById(R.id.quantityEditText);
+        Button submitOrderButton = dialogView.findViewById(R.id.submitOrderButton);
+
+        orderPizzaNameTextView.setText(pizza.getName());
+
+        sizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updatePriceTextView(priceTextView, position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+
+
+        submitOrderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String size = sizeSpinner.getSelectedItem().toString();
+                String quantityStr = quantityEditText.getText().toString();
+                if (quantityStr.isEmpty()) {
+                    showToast("Please enter quantity.");
+                    return;
+                }
+                int quantity = Integer.parseInt(quantityStr);
+                if (quantity <= 0) {
+                    showToast("Quantity should be greater than zero.");
+                    return;
+                }
+                double price = getPriceForSize(size) * quantity;
+
+                // Get current date and time
+                String date = getCurrentDate();
+
+                // Get current time
+                long currentTimeMillis = System.currentTimeMillis();
+                String time = formatTime(String.valueOf(currentTimeMillis));
+
+                // Insert the order into the database
+                boolean success = dbHelper.insertOrder(dbHelper.getPizzaIdByName(pizza.getName()), pizza.getName(), size, quantity, price, date, time);
+                if (success) {
+                    showToast(String.format("Ordered %d %s pizza(s) for $%.2f", quantity, size, price));
+                } else {
+                    showToast("Failed to submit order.");
+                }
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void updatePriceTextView(TextView priceTextView, int sizePosition) {
+        double price;
+        switch (sizePosition) {
+            case 0:
+                price = pizza.getSmallPrice();
+                break;
+            case 1:
+                price = pizza.getMediumPrice();
+                break;
+            case 2:
+                price = pizza.getLargePrice();
+                break;
+            default:
+                price = 0.0;
+                break;
+        }
+        priceTextView.setText(String.format("Price: $%.2f", price));
+    }
+
+    private double getPriceForSize(String size) {
+        switch (size) {
+            case "Small":
+                return pizza.getSmallPrice();
+            case "Medium":
+                return pizza.getMediumPrice();
+            case "Large":
+                return pizza.getLargePrice();
+            default:
+                return 0.0;
+        }
+    }
+
+    private String getCurrentDate(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
+
+    private String formatTime(String timestamp) {
+        long millis = Long.parseLong(timestamp);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        return sdf.format(new Date(millis));
+    }
+
 }

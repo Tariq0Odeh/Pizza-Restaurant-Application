@@ -65,7 +65,8 @@ public class CustomerHomeActivity extends AppCompatActivity implements Navigatio
                 getSupportActionBar().setTitle("Pizza Menu");
                 break;
             case R.id.nav_orders:
-                // Handle Orders click
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new OrdersFragment()).commit();
                 getSupportActionBar().setTitle("Your Orders");
                 break;
             case R.id.nav_favorites:

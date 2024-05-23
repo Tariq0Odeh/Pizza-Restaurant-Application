@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -14,11 +15,12 @@ import java.util.List;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "PizzaDatabase";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 15;
 
     private static final String TABLE_USER = "user";
     private static final String TABLE_PIZZA = "pizza";
-
+    private static final String TABLE_FAVORITES = "favorites";
+    private static final String TABLE_ORDERS = "orders";
 
     // User table columns
     private static final String COLUMN_ID = "id";
@@ -39,14 +41,22 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PIZZA_MEDIUM_PRICE = "medium_price";
     private static final String COLUMN_PIZZA_LARGE_PRICE = "large_price";
 
-    private static final String TABLE_FAVORITES = "favorites";
+    // Favorites table columns
     private static final String COLUMN_FAVORITE_ID = "favorite_id";
     private static final String COLUMN_USER_EMAIL = "user_email";
 
+    // Orders table columns
+    private static final String COLUMN_ORDER_ID = "order_id";
+    private static final String COLUMN_PIZZA_ID = "pizza_id";
+    private static final String COLUMN_ORDER_PIZZA_NAME = "pizza_name";
+    private static final String COLUMN_ORDER_SIZE = "size";
+    private static final String COLUMN_ORDER_QUANTITY = "quantity";
+    private static final String COLUMN_ORDER_TOTAL_PRICE = "total_price";
+    private static final String COLUMN_ORDER_DATE = "date";
+    private static final String COLUMN_ORDER_TIME = "time";
 
     private static String user_email = "";
     private boolean clearTableFlag = false;
-
 
     public DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -54,6 +64,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        insertAdminUserIfNeeded(db);
         String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_USER +
                 "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -89,13 +100,32 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COLUMN_FAVORITE_ID + ") REFERENCES " + TABLE_PIZZA + "(" + COLUMN_ID + ")" +
                 ")";
         db.execSQL(CREATE_FAVORITES_TABLE);
+
+        String CREATE_ORDERS_TABLE = "CREATE TABLE " + TABLE_ORDERS +
+                "(" +
+                COLUMN_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_USER_EMAIL + " TEXT," +
+                COLUMN_PIZZA_ID + " INTEGER," +
+                COLUMN_ORDER_PIZZA_NAME + " TEXT," +
+                COLUMN_ORDER_SIZE + " TEXT," +
+                COLUMN_ORDER_QUANTITY + " INTEGER," +
+                COLUMN_ORDER_TOTAL_PRICE + " REAL," +
+                COLUMN_ORDER_DATE + " TEXT," +
+                COLUMN_ORDER_TIME + " TEXT," +
+                "FOREIGN KEY(" + COLUMN_USER_EMAIL + ") REFERENCES " + TABLE_USER + "(" + COLUMN_EMAIL + ")," +
+                "FOREIGN KEY(" + COLUMN_PIZZA_ID + ") REFERENCES " + TABLE_PIZZA + "(" + COLUMN_ID + ")" +
+                ")";
+        db.execSQL(CREATE_ORDERS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PIZZA);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAVORITES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS);
         onCreate(db);
+        insertAdminUserIfNeeded(db);
     }
 
     public boolean insertUser(User user) {
@@ -261,18 +291,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
-    public void insertAdminUser() {
-        User adminUser = new User(
-                "t@gmail.com",
-                "0509876543",
-                "tariq",
-                "odeh",
-                "male",
-                "ttpp1100",
-                null,
-                true
-        );
-        insertUser(adminUser);
+    private void insertAdminUserIfNeeded(SQLiteDatabase db) {
+        if (!checkEmailExists("t@gmail.com")) {
+            User adminUser = new User(
+                    "t@gmail.com",
+                    "0509876543",
+                    "tariq",
+                    "odeh",
+                    "male",
+                    "ttpp1100",
+                    null,
+                    true
+            );
+            insertUser(adminUser);
+        }
     }
 
     public List<Pizza> getAllPizzas() {
@@ -373,5 +405,82 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         return pizzaId;
     }
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public boolean insertOrder(int pizzaId, String pizzaName, String size, int quantity, double totalPrice, String date, String time) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("user_email", user_email);
+        values.put("pizza_id", pizzaId);
+        values.put("pizza_name", pizzaName);
+        values.put("size", size);
+        values.put("quantity", quantity);
+        values.put("total_price", totalPrice);
+        values.put("date", date);
+        values.put("time", time);
+        long result = db.insert("orders", null, values);
+        db.close();
+        return result != -1;
+    }
+
+    public List<Order> getUserOrders() {
+        List<Order> orders = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM orders WHERE user_email=?", new String[]{user_email});
+        if (cursor.moveToFirst()) {
+            do {
+                int orderId = cursor.getInt(cursor.getColumnIndexOrThrow("order_id"));
+                int pizzaId = cursor.getInt(cursor.getColumnIndexOrThrow("pizza_id"));
+                String pizzaName = cursor.getString(cursor.getColumnIndexOrThrow("pizza_name"));
+                String size = cursor.getString(cursor.getColumnIndexOrThrow("size"));
+                int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+                double totalPrice = cursor.getDouble(cursor.getColumnIndexOrThrow("total_price"));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
+                Order order = new Order(orderId, pizzaId, pizzaName, size, quantity, totalPrice, date, time);
+                orders.add(order);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return orders;
+    }
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public List<OrderWithCustomerName> getAllOrdersWithCustomerName() {
+        List<OrderWithCustomerName> ordersWithCustomerName = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor userCursor = db.rawQuery("SELECT " + COLUMN_EMAIL + ", " + COLUMN_FIRST_NAME + ", " + COLUMN_LAST_NAME + " FROM " + TABLE_USER, null);
+        if (userCursor.moveToFirst()) {
+            do {
+                String userEmail = userCursor.getString(userCursor.getColumnIndexOrThrow(COLUMN_EMAIL));
+                String firstName = userCursor.getString(userCursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME));
+                String lastName = userCursor.getString(userCursor.getColumnIndexOrThrow(COLUMN_LAST_NAME));
+
+                Cursor orderCursor = db.rawQuery("SELECT * FROM " + TABLE_ORDERS + " WHERE " + COLUMN_USER_EMAIL + "=?", new String[]{userEmail});
+                if (orderCursor.moveToFirst()) {
+                    do {
+                        int orderId = orderCursor.getInt(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_ID));
+                        int pizzaId = orderCursor.getInt(orderCursor.getColumnIndexOrThrow(COLUMN_PIZZA_ID));
+                        String pizzaName = orderCursor.getString(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_PIZZA_NAME));
+                        String size = orderCursor.getString(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_SIZE));
+                        int quantity = orderCursor.getInt(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_QUANTITY));
+                        double totalPrice = orderCursor.getDouble(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_TOTAL_PRICE));
+                        String date = orderCursor.getString(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_DATE));
+                        String time = orderCursor.getString(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_TIME));
+
+                        OrderWithCustomerName order = new OrderWithCustomerName(orderId, pizzaId, pizzaName, size, quantity, totalPrice, date, time, firstName, lastName);
+                        ordersWithCustomerName.add(order);
+                    } while (orderCursor.moveToNext());
+                }
+                orderCursor.close();
+            } while (userCursor.moveToNext());
+        }
+        userCursor.close();
+        return ordersWithCustomerName;
+    }
+
+
 
 }

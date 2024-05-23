@@ -14,7 +14,6 @@
 </string-array>
 
 <string-array name="sizes">
-    <item>Any Size</item>
     <item>Small</item>
     <item>Medium</item>
     <item>Large</item>

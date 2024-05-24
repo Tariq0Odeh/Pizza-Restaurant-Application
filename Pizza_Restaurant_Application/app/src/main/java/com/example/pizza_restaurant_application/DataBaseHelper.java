@@ -640,7 +640,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_SPECIAL_OFFERS_ORDERS + " WHERE " + COLUMN_USER_EMAIL + "=?", new String[]{user_email});
         if (cursor.moveToFirst()) {
             do {
-                int orderId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDER_ID));
+                int orderId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SPECIAL_OFFER_ORDER_ID));
                 int specialOfferId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SPECIAL_OFFER_ID));
                 String pizzaName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
                 String size = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_SIZE));
@@ -654,6 +654,43 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return specialOfferOrders;
     }
+
+
+    public List<SpecialOrderWithCustomerName> getSpecialOfferOrdersWithName() {
+        List<SpecialOrderWithCustomerName> specialOfferOrdersWithCustomerName = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to get user information
+        Cursor userCursor = db.rawQuery("SELECT " + COLUMN_EMAIL + ", " + COLUMN_FIRST_NAME + ", " + COLUMN_LAST_NAME + " FROM " + TABLE_USER, null);
+        if (userCursor.moveToFirst()) {
+            do {
+                String userEmail = userCursor.getString(userCursor.getColumnIndexOrThrow(COLUMN_EMAIL));
+                String firstName = userCursor.getString(userCursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME));
+                String lastName = userCursor.getString(userCursor.getColumnIndexOrThrow(COLUMN_LAST_NAME));
+
+                // Query to get special offer orders for each user
+                Cursor orderCursor = db.rawQuery("SELECT * FROM " + TABLE_SPECIAL_OFFERS_ORDERS + " WHERE " + COLUMN_USER_EMAIL + "=?", new String[]{userEmail});
+                if (orderCursor.moveToFirst()) {
+                    do {
+                        int orderId = orderCursor.getInt(orderCursor.getColumnIndexOrThrow(COLUMN_SPECIAL_OFFER_ORDER_ID));
+                        int specialOfferId = orderCursor.getInt(orderCursor.getColumnIndexOrThrow(COLUMN_SPECIAL_OFFER_ID));
+                        String pizzaName = orderCursor.getString(orderCursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
+                        String size = orderCursor.getString(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_SIZE));
+                        double totalPrice = orderCursor.getDouble(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_TOTAL_PRICE));
+                        String date = orderCursor.getString(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_DATE));
+                        String time = orderCursor.getString(orderCursor.getColumnIndexOrThrow(COLUMN_ORDER_TIME));
+
+                        SpecialOrderWithCustomerName order = new SpecialOrderWithCustomerName(orderId, specialOfferId, userEmail, pizzaName, size, totalPrice, date, time, firstName, lastName);
+                        specialOfferOrdersWithCustomerName.add(order);
+                    } while (orderCursor.moveToNext());
+                }
+                orderCursor.close();
+            } while (userCursor.moveToNext());
+        }
+        userCursor.close();
+        return specialOfferOrdersWithCustomerName;
+    }
+
 
 
     //++++++++++++++++++++++++++++++++++++++++++++++++

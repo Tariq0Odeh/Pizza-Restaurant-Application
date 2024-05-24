@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewAllOrdersFragment extends Fragment {
@@ -35,18 +36,21 @@ public class ViewAllOrdersFragment extends Fragment {
         ordersListView = view.findViewById(R.id.ordersListView);
 
         // Fetch all orders with customer names from the database
-        List<OrderWithCustomerName> ordersWithCustomerName = getAllOrdersWithCustomerName();
+        List<Object> allOrdersWithCustomerName = getAllOrdersWithCustomerName();
 
         // Create a custom adapter to display the orders in the ListView
-        AllOrderAdapter adapter = new AllOrderAdapter(requireContext(), ordersWithCustomerName);
+        AllOrderAdapter adapter = new AllOrderAdapter(requireContext(), allOrdersWithCustomerName);
 
         // Set the adapter to the ListView
         ordersListView.setAdapter(adapter);
     }
 
-    private List<OrderWithCustomerName> getAllOrdersWithCustomerName() {
+    private List<Object> getAllOrdersWithCustomerName() {
         // Use the database helper to fetch all orders with customer names
         DataBaseHelper dbHelper = new DataBaseHelper(requireContext());
-        return dbHelper.getAllOrdersWithCustomerName();
+        List<Object> allOrders = new ArrayList<>();
+        allOrders.addAll(dbHelper.getAllOrdersWithCustomerName());
+        allOrders.addAll(dbHelper.getSpecialOfferOrdersWithName());
+        return allOrders;
     }
 }

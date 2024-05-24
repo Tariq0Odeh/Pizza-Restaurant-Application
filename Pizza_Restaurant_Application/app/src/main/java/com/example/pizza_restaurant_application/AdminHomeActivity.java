@@ -68,7 +68,8 @@ public class AdminHomeActivity extends AppCompatActivity implements NavigationVi
                 getSupportActionBar().setTitle("View All Orders");
                 break;
             case R.id.nav_add_special_offers:
-                // Handle Add Special Offers click
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new AddSpecialOfferFragment()).commit();
                 getSupportActionBar().setTitle("Add Special Offers");
                 break;
             case R.id.nav_logout:

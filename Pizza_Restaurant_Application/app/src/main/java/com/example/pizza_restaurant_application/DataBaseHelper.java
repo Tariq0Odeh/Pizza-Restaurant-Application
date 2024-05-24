@@ -14,13 +14,17 @@ import java.util.List;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "PizzaDatabase";
-    private static final int DATABASE_VERSION = 15;
+    private static final String DATABASE_NAME = "Database2";
+    private static final int DATABASE_VERSION = 7;
 
+    // Tables
     private static final String TABLE_USER = "user";
     private static final String TABLE_PIZZA = "pizza";
     private static final String TABLE_FAVORITES = "favorites";
     private static final String TABLE_ORDERS = "orders";
+    private static final String TABLE_SPECIAL_OFFERS = "special_offers";
+    private static final String TABLE_SPECIAL_OFFERS_FAVORITES = "special_offers_favorites";
+    private static final String TABLE_SPECIAL_OFFERS_ORDERS = "special_offers_orders";
 
     // User table columns
     private static final String COLUMN_ID = "id";
@@ -55,6 +59,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ORDER_DATE = "date";
     private static final String COLUMN_ORDER_TIME = "time";
 
+    private static final String COLUMN_SPECIAL_OFFER_ID = "special_offer_id";
+
+    // Update the table columns
+    private static final String COLUMN_SPECIAL_OFFER_ORDER_ID = "special_offer_order_id";
+
+    private static final String COLUMN_SPECIAL_OFFER_FAVORITE_ID = "special_offer_favorite_id";
+
     private static String user_email = "";
     private boolean clearTableFlag = false;
 
@@ -64,7 +75,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        insertAdminUserIfNeeded(db);
         String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_USER +
                 "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -116,6 +126,46 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COLUMN_PIZZA_ID + ") REFERENCES " + TABLE_PIZZA + "(" + COLUMN_ID + ")" +
                 ")";
         db.execSQL(CREATE_ORDERS_TABLE);
+
+        String CREATE_SPECIAL_OFFERS_TABLE = "CREATE TABLE " + TABLE_SPECIAL_OFFERS +
+                "(" +
+                COLUMN_SPECIAL_OFFER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_PIZZA_NAME + " TEXT," +
+                COLUMN_PIZZA_CATEGORY + " TEXT," +
+                COLUMN_PIZZA_DESCRIPTION + " TEXT," +
+                COLUMN_ORDER_SIZE + " TEXT," +
+                COLUMN_ORDER_TOTAL_PRICE + " REAL," +
+                COLUMN_ORDER_DATE + " TEXT" +
+                ")";
+        db.execSQL(CREATE_SPECIAL_OFFERS_TABLE);
+
+
+        String CREATE_SPECIAL_OFFERS_ORDERS_TABLE = "CREATE TABLE " + TABLE_SPECIAL_OFFERS_ORDERS + "("
+                + COLUMN_SPECIAL_OFFER_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_USER_EMAIL + " TEXT,"
+                + COLUMN_SPECIAL_OFFER_ID + " INTEGER,"
+                + COLUMN_PIZZA_NAME + " TEXT,"
+                + COLUMN_ORDER_SIZE + " TEXT,"
+                + COLUMN_ORDER_QUANTITY + " INTEGER,"
+                + COLUMN_ORDER_TOTAL_PRICE + " REAL,"
+                + COLUMN_ORDER_DATE + " TEXT,"
+                + COLUMN_ORDER_TIME + " TEXT,"
+                + "FOREIGN KEY(" + COLUMN_USER_EMAIL + ") REFERENCES " + TABLE_USER + "(" + COLUMN_EMAIL + "),"
+                + "FOREIGN KEY(" + COLUMN_SPECIAL_OFFER_ID + ") REFERENCES " + TABLE_SPECIAL_OFFERS + "(" + COLUMN_SPECIAL_OFFER_ID + ")" + ")";
+        db.execSQL(CREATE_SPECIAL_OFFERS_ORDERS_TABLE);
+
+
+        // Creating the special offers favorites table
+        String CREATE_SPECIAL_OFFERS_FAVORITES_TABLE = "CREATE TABLE " + TABLE_SPECIAL_OFFERS_FAVORITES +
+                "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_USER_EMAIL + " TEXT," +
+                COLUMN_SPECIAL_OFFER_FAVORITE_ID + " INTEGER," +
+                "FOREIGN KEY(" + COLUMN_USER_EMAIL + ") REFERENCES " + TABLE_USER + "(" + COLUMN_EMAIL + ")," +
+                "FOREIGN KEY(" + COLUMN_SPECIAL_OFFER_FAVORITE_ID + ") REFERENCES " + TABLE_SPECIAL_OFFERS + "(" + COLUMN_SPECIAL_OFFER_ID + ")" +
+                ")";
+        db.execSQL(CREATE_SPECIAL_OFFERS_FAVORITES_TABLE);
+
     }
 
     @Override
@@ -124,8 +174,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PIZZA);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAVORITES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SPECIAL_OFFERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SPECIAL_OFFERS_ORDERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SPECIAL_OFFERS_FAVORITES);
+
         onCreate(db);
-        insertAdminUserIfNeeded(db);
     }
 
     public boolean insertUser(User user) {
@@ -291,7 +344,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
-    private void insertAdminUserIfNeeded(SQLiteDatabase db) {
+    public void insertAdminUserIfNeeded() {
         if (!checkEmailExists("t@gmail.com")) {
             User adminUser = new User(
                     "t@gmail.com",
@@ -481,6 +534,193 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return ordersWithCustomerName;
     }
 
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public List<String> getAllPizzaTypes() {
+        List<String> pizzaTypes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT DISTINCT " + COLUMN_PIZZA_NAME + " FROM " + TABLE_PIZZA, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String pizzaType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
+                pizzaTypes.add(pizzaType);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return pizzaTypes;
+    }
+
+    public boolean insertSpecialOffer(String type, String size, double price, String period) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Retrieve pizza category and description from the Pizza table based on the provided pizza name
+        String category = "";
+        String description = "";
+        Cursor pizzaCursor = db.query(TABLE_PIZZA,
+                new String[]{COLUMN_PIZZA_CATEGORY, COLUMN_PIZZA_DESCRIPTION},
+                COLUMN_PIZZA_NAME + "=?",
+                new String[]{type},
+                null, null, null);
+
+        if (pizzaCursor != null && pizzaCursor.moveToFirst()) {
+            category = pizzaCursor.getString(pizzaCursor.getColumnIndexOrThrow(COLUMN_PIZZA_CATEGORY));
+            description = pizzaCursor.getString(pizzaCursor.getColumnIndexOrThrow(COLUMN_PIZZA_DESCRIPTION));
+            pizzaCursor.close();
+        }
+
+        // Insert the special offer with all the necessary information
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PIZZA_NAME, type);
+        values.put(COLUMN_PIZZA_CATEGORY, category); // Add pizza category
+        values.put(COLUMN_PIZZA_DESCRIPTION, description); // Add pizza description
+        values.put(COLUMN_ORDER_SIZE, size);
+        values.put(COLUMN_ORDER_TOTAL_PRICE, price);
+        values.put(COLUMN_ORDER_DATE, period);
+        long result = db.insert(TABLE_SPECIAL_OFFERS, null, values);
+
+        db.close();
+        return result != -1;
+    }
+
+    public List<SpecialOffer> getAllSpecialOffers() {
+        List<SpecialOffer> specialOffers = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to retrieve all special offers
+        Cursor cursor = db.query(TABLE_SPECIAL_OFFERS, null, null, null, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // Extracting data from the cursor
+                int specialOfferId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SPECIAL_OFFER_ID));
+                String pizzaName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_CATEGORY));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_DESCRIPTION));
+                String size = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_SIZE));
+                double price = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_ORDER_TOTAL_PRICE));
+                String period = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_DATE));
+
+                // Creating SpecialOffer object and adding to the list
+                SpecialOffer specialOffer = new SpecialOffer(specialOfferId, pizzaName, category, description, size, price, period);
+                specialOffers.add(specialOffer);
+            } while (cursor.moveToNext());
+
+            cursor.close();
+        }
+
+        db.close();
+        return specialOffers;
+    }
+
+
+    //++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+    public boolean insertSpecialOfferOrder(int specialOfferId, String pizzaName, String size, int quantity, double totalPrice, String date, String time) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_EMAIL, user_email);
+        values.put(COLUMN_SPECIAL_OFFER_ID, specialOfferId);
+        values.put(COLUMN_PIZZA_NAME, pizzaName);
+        values.put(COLUMN_ORDER_SIZE, size);
+        values.put(COLUMN_ORDER_QUANTITY, quantity); // Add quantity to ContentValues
+        values.put(COLUMN_ORDER_TOTAL_PRICE, totalPrice);
+        values.put(COLUMN_ORDER_DATE, date);
+        values.put(COLUMN_ORDER_TIME, time);
+        long result = db.insert(TABLE_SPECIAL_OFFERS_ORDERS, null, values);
+        db.close();
+        return result != -1;
+    }
+
+
+
+    public List<SpecialOfferOrder> getSpecialOfferOrders() {
+        List<SpecialOfferOrder> specialOfferOrders = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_SPECIAL_OFFERS_ORDERS + " WHERE " + COLUMN_USER_EMAIL + "=?", new String[]{user_email});
+        if (cursor.moveToFirst()) {
+            do {
+                int orderId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDER_ID));
+                int specialOfferId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SPECIAL_OFFER_ID));
+                String pizzaName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
+                String size = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_SIZE));
+                double totalPrice = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_ORDER_TOTAL_PRICE));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_DATE));
+                String time = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_TIME));
+                SpecialOfferOrder order = new SpecialOfferOrder(orderId, specialOfferId, user_email, pizzaName, size, totalPrice, date, time);
+                specialOfferOrders.add(order);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return specialOfferOrders;
+    }
+
+
+    //++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public boolean addFavoriteSpecialOffer(int specialOfferId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_EMAIL, user_email);
+        values.put(COLUMN_SPECIAL_OFFER_FAVORITE_ID, specialOfferId);
+        long result = db.insert(TABLE_SPECIAL_OFFERS_FAVORITES, null, values);
+        db.close();
+        return result != -1;
+    }
+
+    public boolean removeFavoriteSpecialOffer(int specialOfferId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.delete(TABLE_SPECIAL_OFFERS_FAVORITES, COLUMN_USER_EMAIL + " = ? AND " + COLUMN_SPECIAL_OFFER_FAVORITE_ID + " = ?",
+                new String[]{user_email, String.valueOf(specialOfferId)});
+        db.close();
+        return result > 0;
+    }
+
+    public boolean isFavoriteSpecialOffer(int specialOfferId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_SPECIAL_OFFERS_FAVORITES +
+                " WHERE " + COLUMN_USER_EMAIL + " = ? AND " + COLUMN_SPECIAL_OFFER_FAVORITE_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{user_email, String.valueOf(specialOfferId)});
+        boolean isFavorite = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return isFavorite;
+    }
+
+
+    public List<SpecialOffer> getFavoriteSpecialOffers() {
+        List<SpecialOffer> favoriteSpecialOffers = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT "
+                + TABLE_SPECIAL_OFFERS + "." + COLUMN_SPECIAL_OFFER_ID + ", "
+                + TABLE_SPECIAL_OFFERS + "." + COLUMN_PIZZA_NAME + ", "
+                + TABLE_SPECIAL_OFFERS + "." + COLUMN_PIZZA_CATEGORY + ", "
+                + TABLE_SPECIAL_OFFERS + "." + COLUMN_PIZZA_DESCRIPTION + ", "
+                + TABLE_SPECIAL_OFFERS + "." + COLUMN_ORDER_SIZE + ", "
+                + TABLE_SPECIAL_OFFERS + "." + COLUMN_ORDER_TOTAL_PRICE + ", "
+                + TABLE_SPECIAL_OFFERS + "." + COLUMN_ORDER_DATE
+                + " FROM " + TABLE_SPECIAL_OFFERS
+                + " INNER JOIN " + TABLE_SPECIAL_OFFERS_FAVORITES
+                + " ON " + TABLE_SPECIAL_OFFERS + "." + COLUMN_SPECIAL_OFFER_ID + " = " + TABLE_SPECIAL_OFFERS_FAVORITES + "." + COLUMN_SPECIAL_OFFER_FAVORITE_ID
+                + " WHERE " + TABLE_SPECIAL_OFFERS_FAVORITES + "." + COLUMN_USER_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{user_email});
+        if (cursor.moveToFirst()) {
+            do {
+                int specialOfferId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SPECIAL_OFFER_ID));
+                String pizzaName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
+                String pizzaCategory = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_CATEGORY));
+                String pizzaDescription = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_DESCRIPTION));
+                String size = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_SIZE));
+                double price = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_ORDER_TOTAL_PRICE));
+                String period = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_DATE)); // Assuming period is the date here, adjust as needed
+
+                SpecialOffer specialOffer = new SpecialOffer(specialOfferId, pizzaName, pizzaCategory, pizzaDescription, size, price, period);
+                favoriteSpecialOffers.add(specialOffer);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return favoriteSpecialOffers;
+    }
 
 
 }

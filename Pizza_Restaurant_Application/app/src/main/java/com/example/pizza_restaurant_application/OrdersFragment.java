@@ -11,9 +11,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrdersFragment extends Fragment {
+
     private RecyclerView recyclerView;
     private OrderAdapter orderAdapter;
     private DataBaseHelper dbHelper;
@@ -29,11 +32,17 @@ public class OrdersFragment extends Fragment {
 
         // Fetch user's orders from the database
         List<Order> orderList = dbHelper.getUserOrders();
+        List<SpecialOfferOrder> specialOrderList = dbHelper.getSpecialOfferOrders();
+
+        // Merge both lists
+        List<Object> mergedList = new ArrayList<>();
+        mergedList.addAll(orderList);
+        mergedList.addAll(specialOrderList);
 
         // Initialize and set the adapter
-        orderAdapter = new OrderAdapter(orderList, new OrderAdapter.OnOrderClickListener() {
+        orderAdapter = new OrderAdapter(mergedList, new OrderAdapter.OnOrderClickListener() {
             @Override
-            public void onOrderClick(Order order) {
+            public void onOrderClick(Object order) {
                 // Handle order click
                 // For example, display order details in a dialog
                 showOrderDetailsDialog(order);
@@ -45,11 +54,21 @@ public class OrdersFragment extends Fragment {
     }
 
     // Method to show order details in a dialog
-    private void showOrderDetailsDialog(Order order) {
+    private void showOrderDetailsDialog(Object order) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Order Details");
-        String orderDetails = String.format("Order ID: %d, Pizza Name: %s, Size: %s, Quantity: %d, Total Price: $%.2f, Date: %s, Time: %s",
-                order.getOrderId(), order.getPizzaName(), order.getSize(), order.getQuantity(), order.getTotalPrice(), order.getDate(), order.getTime());
+        String orderDetails = "";
+        if(order instanceof Order) {
+            Order obj = (Order) order;
+            builder.setTitle("Order Details");
+            orderDetails = String.format("Order ID: %d, Pizza Name: %s, Size: %s, Quantity: %d, Total Price: $%.2f, Date: %s, Time: %s", obj.getOrderId(), obj.getPizzaName(), obj.getSize(), obj.getQuantity(), obj.getTotalPrice(), obj.getDate(), obj.getTime());
+        }
+        else if(order instanceof SpecialOfferOrder) {
+            builder.setTitle("Special Order Details");
+            SpecialOfferOrder obj = (SpecialOfferOrder) order;
+            orderDetails = String.format("Order ID: %d, Pizza Name: %s, Size: %s, Total Price: $%.2f, Date: %s, Time: %s", obj.getOrderId(), obj.getPizzaName(), obj.getSize(), obj.getTotalPrice(), obj.getOrderDate(), obj.getOrderTime());
+
+        }
+
         builder.setMessage(orderDetails);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override

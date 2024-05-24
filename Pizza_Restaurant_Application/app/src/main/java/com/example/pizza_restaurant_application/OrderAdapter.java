@@ -9,14 +9,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
-    private List<Order> orderList;
+    private List<Object> orderList;
     private OnOrderClickListener listener;
 
     public interface OnOrderClickListener {
-        void onOrderClick(Order order);
+        void onOrderClick(Object order);
     }
 
-    public OrderAdapter(List<Order> orderList, OnOrderClickListener listener) {
+    public OrderAdapter(List<Object> orderList, OnOrderClickListener listener) {
         this.orderList = orderList;
         this.listener = listener;
     }
@@ -30,7 +30,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        Order order = orderList.get(position);
+        Object order = orderList.get(position);
         holder.bind(order);
     }
 
@@ -50,7 +50,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        Order order = orderList.get(position);
+                        Object order = orderList.get(position);
                         if (listener != null) {
                             listener.onOrderClick(order);
                         }
@@ -59,9 +59,17 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             });
         }
 
-        void bind(Order order) {
-            orderTextView.setText(String.format("Order ID: %d, Pizza Name: %s, Date: %s, Time: %s",
-                    order.getOrderId(), order.getPizzaName(), order.getDate(), order.getTime()));
+        void bind(Object order) {
+            if(order instanceof Order) {
+                Order obj = (Order) order;
+                orderTextView.setText(String.format("Order ID: %d, Pizza Name: %s, Date: %s, Time: %s",
+                        obj.getOrderId(), obj.getPizzaName(), obj.getDate(), obj.getTime()));
+            }
+            else if(order instanceof SpecialOfferOrder) {
+                SpecialOfferOrder obj = (SpecialOfferOrder) order;
+                orderTextView.setText(String.format("Order ID: %d, Pizza Name: %s, Date: %s, Time: %s",
+                        obj.getOrderId(), obj.getPizzaName(), obj.getOrderDate(), obj.getOrderTime()));
+            }
         }
     }
 }

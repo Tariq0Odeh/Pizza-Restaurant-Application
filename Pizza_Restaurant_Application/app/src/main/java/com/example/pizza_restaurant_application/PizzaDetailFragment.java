@@ -231,6 +231,10 @@ public class PizzaDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String size = sizeSpinner.getSelectedItem().toString();
+                if (size.equals("Any Size")) {
+                    showToast("Please choose the size");
+                    return;
+                }
                 String quantityStr = quantityEditText.getText().toString();
                 if (quantityStr.isEmpty()) {
                     showToast("Please enter quantity.");
@@ -267,13 +271,13 @@ public class PizzaDetailFragment extends Fragment {
     private void updatePriceTextView(TextView priceTextView, int sizePosition) {
         double price;
         switch (sizePosition) {
-            case 0:
+            case 1:
                 price = pizza.getSmallPrice();
                 break;
-            case 1:
+            case 2:
                 price = pizza.getMediumPrice();
                 break;
-            case 2:
+            case 3:
                 price = pizza.getLargePrice();
                 break;
             default:

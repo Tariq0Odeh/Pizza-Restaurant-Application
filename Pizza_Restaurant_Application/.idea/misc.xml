@@ -28,8 +28,10 @@
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/footer.xml" value="0.11574074074074074" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_add_admin.xml" value="0.1911231884057971" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_add_special_offer.xml" value="0.1911231884057971" />
+        <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_admin_statistics.xml" value="0.2078804347826087" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_call_find_us.xml" value="0.11574074074074074" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_favorites.xml" value="0.12158054711246201" />
+        <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_favorites_offers.xml" value="0.2078804347826087" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_gallery.xml" value="0.1911231884057971" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_home.xml" value="0.11574074074074074" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/fragment_orders.xml" value="0.1911231884057971" />
@@ -51,7 +53,7 @@
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/nav_header_navigation_bar.xml" value="0.1911231884057971" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/layout/test.xml" value="0.12158054711246201" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/menu/activity_main_drawer.xml" value="0.25" />
-        <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/menu/adnavigation.xml" value="0.14270833333333333" />
+        <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/menu/adnavigation.xml" value="0.264" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/menu/navigation.xml" value="0.264" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/menu/navigationAdmin.xml" value="0.234375" />
         <entry key="..\:/Users/tariq/OneDrive/Desktop/Pizza-Restaurant-Application/Pizza_Restaurant_Application/app/src/main/res/menu/navigation_bar.xml" value="0.25" />

@@ -72,6 +72,11 @@ public class AdminHomeActivity extends AppCompatActivity implements NavigationVi
                         new AddSpecialOfferFragment()).commit();
                 getSupportActionBar().setTitle("Add Special Offers");
                 break;
+            case R.id.nav_view_Statistics:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new AdminStatisticsFragment()).commit();
+                getSupportActionBar().setTitle("View Statistics");
+                break;
             case R.id.nav_logout:
                 // Handle Logout click
                 // Redirect to LoginActivity

@@ -11,6 +11,10 @@ public class SpecialOffer implements Serializable {
     private double price;
     private String period;
 
+    public SpecialOffer(){
+
+    }
+
     public SpecialOffer(int specialOfferId, String pizzaName, String pizzaCategory, String pizzaDescription, String size, double price, String period) {
         this.specialOfferId = specialOfferId;
         this.pizzaName = pizzaName;

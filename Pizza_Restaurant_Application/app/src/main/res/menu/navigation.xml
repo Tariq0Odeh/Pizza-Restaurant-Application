@@ -12,8 +12,11 @@
             android:id="@+id/nav_orders"
             android:title="Your Orders" />
         <item
-            android:id="@+id/nav_favorites"
-            android:title="Your Favorites" />
+            android:id="@+id/nav_favorites_pizza"
+            android:title="Your Favorites Pizza" />
+        <item
+            android:id="@+id/nav_favorites_offers"
+            android:title="Your Favorites Offers" />
         <item
             android:id="@+id/nav_special_offers"
             android:title="Special Offers" />

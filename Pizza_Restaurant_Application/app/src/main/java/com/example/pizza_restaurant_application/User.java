@@ -23,7 +23,6 @@ public class User {
         this.isAdmin = isAdmin;
     }
 
-    // Getters and setters
     public String getEmail() {
         return email;
     }

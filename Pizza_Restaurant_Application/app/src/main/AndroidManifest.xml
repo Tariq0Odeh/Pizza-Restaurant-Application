@@ -15,25 +15,25 @@
         android:networkSecurityConfig="@xml/network_security_config"> <!-- Add this line -->
 
         <activity
-            android:name=".AdminHomeActivity"
+            android:name=".Admin.AdminHomeActivity"
             android:exported="false" />
         <activity
-            android:name=".CustomerHomeActivity"
+            android:name=".Customer.CustomerHomeActivity"
             android:exported="false" />
         <activity
-            android:name=".SignUpActivity"
+            android:name=".Registration.SignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Registration.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginOrSignUpActivity"
+            android:name=".Registration.LoginOrSignUpActivity"
             android:exported="false" />
         <activity
             android:name=".LoginORSignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Registration.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

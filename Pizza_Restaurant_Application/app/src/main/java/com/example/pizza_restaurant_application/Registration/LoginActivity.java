@@ -14,7 +14,7 @@ import com.example.pizza_restaurant_application.Admin.AdminHomeActivity;
 import com.example.pizza_restaurant_application.Customer.CustomerHomeActivity;
 import com.example.pizza_restaurant_application.DataAPI.DataBaseHelper;
 import com.example.pizza_restaurant_application.R;
-import com.example.pizza_restaurant_application.User;
+import com.example.pizza_restaurant_application.DataAPI.User;
 
 public class LoginActivity extends AppCompatActivity {
 

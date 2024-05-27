@@ -6,9 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
+import com.example.pizza_restaurant_application.DataAPI.OrderWithCustomerName;
 import com.example.pizza_restaurant_application.R;
-
+import com.example.pizza_restaurant_application.DataAPI.SpecialOrderWithCustomerName;
 import java.util.List;
 
 public class AllOrderAdapter extends ArrayAdapter<Object> {
@@ -38,16 +38,16 @@ public class AllOrderAdapter extends ArrayAdapter<Object> {
         if (order instanceof OrderWithCustomerName) {
             OrderWithCustomerName orderWithCustomerName = (OrderWithCustomerName) order;
             if (orderWithCustomerName != null) {
-                // Setting customer name and order details to TextViews
                 holder.customerNameTextView.setText(orderWithCustomerName.getCustomerName());
                 holder.orderDetailsTextView.setText(
-                        "Order ID: " + orderWithCustomerName.getOrderId() +
-                                ", Pizza Name: " + orderWithCustomerName.getPizzaName() +
-                                ", Size: " + orderWithCustomerName.getSize() +
-                                ", Quantity: " + orderWithCustomerName.getQuantity() +
-                                ", Total Price: " + orderWithCustomerName.getTotalPrice() +
-                                ", Date: " + orderWithCustomerName.getDate() +
-                                ", Time: " + orderWithCustomerName.getTime());
+                        "[Normal Order]\n" +
+                        "- Order ID: " + orderWithCustomerName.getOrderId() + "\n" +
+                        "- Pizza Name: " + orderWithCustomerName.getPizzaName() + "\n" +
+                        "- Size: " + orderWithCustomerName.getSize() + "\n" +
+                        "- Quantity: " + orderWithCustomerName.getQuantity() + "\n" +
+                        "- Total Price: " + orderWithCustomerName.getTotalPrice() + "\n" +
+                        "- Date: " + orderWithCustomerName.getDate() + "\n" +
+                        "- Time: " + orderWithCustomerName.getTime() + "\n");
             }
         } else if (order instanceof SpecialOrderWithCustomerName) {
             SpecialOrderWithCustomerName specialOrder = (SpecialOrderWithCustomerName) order;
@@ -55,12 +55,13 @@ public class AllOrderAdapter extends ArrayAdapter<Object> {
                 // Setting customer name and order details to TextViews
                 holder.customerNameTextView.setText(specialOrder.getCustomerName());
                 holder.orderDetailsTextView.setText(
-                        "Order ID: " + specialOrder.getOrderId() +
-                                ", Pizza Name: " + specialOrder.getPizzaName() +
-                                ", Size: " + specialOrder.getSize() +
-                                ", Total Price: " + specialOrder.getTotalPrice() +
-                                ", Date: " + specialOrder.getOrderDate() +
-                                ", Time: " + specialOrder.getOrderTime());
+                        "[Special Order]\n" +
+                        "- Order ID: " + specialOrder.getOrderId() + "\n" +
+                        "- Pizza Name: " + specialOrder.getPizzaName() + "\n" +
+                        "- Size: " + specialOrder.getSize() + "\n" +
+                        "- Total Price: " + specialOrder.getTotalPrice() + "\n" +
+                        "- Date: " + specialOrder.getOrderDate() + "\n" +
+                        "- Time: " + specialOrder.getOrderTime() + "\n");
             }
         }
         return convertView;

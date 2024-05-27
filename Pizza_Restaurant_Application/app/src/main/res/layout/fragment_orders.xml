@@ -7,7 +7,8 @@
         android:id="@+id/ordersRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
-        android:scrollbars="vertical" />
+        android:background="#FFFFFF"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
 
 </RelativeLayout>

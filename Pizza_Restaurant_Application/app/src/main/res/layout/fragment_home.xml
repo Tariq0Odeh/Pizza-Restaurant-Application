@@ -1,10 +1,12 @@
-<!-- fragment_home.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:gravity="center">
 
+    <!-- TextView for the restaurant history title -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -12,11 +14,45 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="16dp"/>
+        android:textColor="@color/secondary_text"
+        android:layout_marginBottom="20dp"/>
 
-    <TextView
+    <!-- CardView to wrap the ImageView for elevation effect -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        android:textSize="16sp"/>
+        android:layout_height="200dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginHorizontal="16dp"
+        app:cardElevation="8dp"
+        app:cardCornerRadius="8dp">
+
+        <ImageView
+            android:id="@+id/imageView_restaurant"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/restaurant_photo" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- ScrollView to make the history content scrollable -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingRight="15dp"
+        android:paddingLeft="30dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="4dp"
+            android:text="\t\t\t\tWelcome to Our Pizza Restaurant!
+            \n\n\tFounded in 1990, our restaurant has been dedicated to bringing the authentic taste of Italy to your table. Our journey began with a simple idea: to create the best pizza using the finest ingredients and traditional techniques. Over the years, we have stayed true to our roots while continuously innovating to delight our customers.
+            \n\n\tOur menu features a wide variety of pizzas, from the classic Margherita to our signature gourmet creations. Each pizza is crafted with love, using freshly made dough, hand-picked vegetables, premium meats, and the finest cheeses. We also offer a selection of delicious appetizers, salads, and desserts to complete your dining experience.
+            \n\n\tAt our restaurant, we believe in the importance of community and family. Our cozy and welcoming atmosphere is perfect for gatherings of all kinds, whether it's a family dinner, a celebration with friends, or a casual meal. We are committed to providing exceptional service and making every visit memorable.
+            \n\n\tThank you for choosing our restaurant. We look forward to serving you and sharing our passion for great pizza!"
+            android:textColor="@color/secondary_text"
+            android:textSize="16sp" />
+    </ScrollView>
+
 </LinearLayout>

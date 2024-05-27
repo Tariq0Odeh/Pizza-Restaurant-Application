@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.example.pizza_restaurant_application.Customer.ProfileFragment;
 import com.example.pizza_restaurant_application.R;
 import com.example.pizza_restaurant_application.Registration.LoginActivity;
 import com.google.android.material.navigation.NavigationView;
@@ -82,11 +81,9 @@ public class AdminHomeActivity extends AppCompatActivity implements NavigationVi
                 getSupportActionBar().setTitle("View Statistics");
                 break;
             case R.id.nav_logout:
-                // Handle Logout click
-                // Redirect to LoginActivity
                 Intent intent = new Intent(AdminHomeActivity.this, LoginActivity.class);
                 startActivity(intent);
-                finish(); // Finish the current activity to prevent the user from navigating back
+                finish();
                 Toast.makeText(getApplicationContext(), "Logout successful", Toast.LENGTH_SHORT).show();
                 break;
         }

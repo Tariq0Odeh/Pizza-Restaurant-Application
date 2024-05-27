@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +12,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.pizza_restaurant_application.R;
 import com.example.pizza_restaurant_application.Registration.LoginActivity;
-import com.example.pizza_restaurant_application.SpecialOffers.SpecialOffersFragment;
+import com.example.pizza_restaurant_application.Admin.ProfileFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class CustomerHomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -26,6 +25,7 @@ public class CustomerHomeActivity extends AppCompatActivity implements Navigatio
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_home);
 
+        // Initialize the DrawerLayout and NavigationView
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -33,22 +33,21 @@ public class CustomerHomeActivity extends AppCompatActivity implements Navigatio
         // Select the "Home" item by default
         navigationView.setCheckedItem(R.id.nav_home);
 
+        // Set up the ActionBarDrawerToggle
         actionBarDrawerToggle = new ActionBarDrawerToggle(
                 this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Display the HomeFragment initially
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 new HomeFragment()).commit();
         getSupportActionBar().setTitle("Home");
     }
 
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Handle action bar item clicks here
         if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -57,6 +56,7 @@ public class CustomerHomeActivity extends AppCompatActivity implements Navigatio
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here
         switch (item.getItemId()) {
             case R.id.nav_home:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
@@ -94,26 +94,20 @@ public class CustomerHomeActivity extends AppCompatActivity implements Navigatio
                 getSupportActionBar().setTitle("Profile");
                 break;
             case R.id.nav_call_find_us:
-                // Handle Call Us or Find Us click
-                // Replace the fragment_container with Call Us or Find Us fragment
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new CallFindUsFragment()).commit();
                 getSupportActionBar().setTitle("Call us or Find us");
                 break;
-
             case R.id.nav_logout:
-                // Handle Logout click
-                // Redirect to LoginActivity
                 Intent intent = new Intent(CustomerHomeActivity.this, LoginActivity.class);
                 startActivity(intent);
-                finish(); // Finish the current activity to prevent the user from navigating back
+                finish();
                 Toast.makeText(getApplicationContext(), "Logout successful", Toast.LENGTH_SHORT).show();
                 break;
-
         }
 
+        // Close the drawer after item selection
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
-
 }

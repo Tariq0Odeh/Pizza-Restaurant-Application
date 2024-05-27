@@ -16,8 +16,7 @@ import android.widget.Spinner;
 
 import com.example.pizza_restaurant_application.DataAPI.DataBaseHelper;
 import com.example.pizza_restaurant_application.R;
-import com.example.pizza_restaurant_application.SpecialOffers.SpecialOffer;
-
+import com.example.pizza_restaurant_application.DataAPI.SpecialOffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -36,9 +35,12 @@ public class FavoritesOffersFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favorites_offers, container, false);
+
+        // Initialize RecyclerView and set its layout manager
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        // Initialize search EditText and filter Spinners
         searchEditText = view.findViewById(R.id.searchEditText);
         priceSpinner = view.findViewById(R.id.priceFilterSpinner);
         sizeSpinner = view.findViewById(R.id.sizeFilterSpinner);
@@ -48,7 +50,7 @@ public class FavoritesOffersFragment extends Fragment {
         setupSpinners();
 
         databaseHelper = new DataBaseHelper(getActivity());
-        loadFavoritePizzas(); // Load favorite pizzas initially
+        loadFavoritePizzas();
 
         return view;
     }
@@ -57,13 +59,12 @@ public class FavoritesOffersFragment extends Fragment {
         List<SpecialOffer> favoritePizzas = databaseHelper.getFavoriteSpecialOffers();
         adapter = new FavoriteOffersAdapter(favoritePizzas, specialOffer -> {
             databaseHelper.removeFavoriteSpecialOffer(specialOffer.getSpecialOfferId());
-            adapter.removeSpecialOffer(specialOffer); // Remove from adapter's list
-            // You can also add a toast message here if needed
+            adapter.removeSpecialOffer(specialOffer);
         });
 
         // Set the adapter to the RecyclerView after initialization
         recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged(); // Notify adapter of dataset change
+        adapter.notifyDataSetChanged();
     }
 
 
@@ -112,6 +113,7 @@ public class FavoritesOffersFragment extends Fragment {
             }
         });
 
+        // Set up the size filter spinner
         ArrayAdapter<CharSequence> sizeAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.sizes, android.R.layout.simple_spinner_item);
         sizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -128,6 +130,7 @@ public class FavoritesOffersFragment extends Fragment {
             }
         });
 
+        // Set up the category filter spinner
         ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.categories, android.R.layout.simple_spinner_item);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -146,6 +149,7 @@ public class FavoritesOffersFragment extends Fragment {
     }
 
     private void filterPizzas() {
+        // Get the search query, selected price range, size, and category
         String query = searchEditText.getText().toString();
         String selectedPrice = priceSpinner.getSelectedItem().toString();
         String selectedSize = sizeSpinner.getSelectedItem().toString();
@@ -168,6 +172,7 @@ public class FavoritesOffersFragment extends Fragment {
     }
 
     private boolean isPizzaInPriceRange(double pizzaPrice, String selectedPrice) {
+        // Check if the pizza price falls within the selected price range
         switch (selectedPrice) {
             case "Under $10":
                 return pizzaPrice < 10.0;

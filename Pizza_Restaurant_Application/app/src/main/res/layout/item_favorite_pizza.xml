@@ -46,17 +46,16 @@
                 android:layout_centerInParent="true"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="20dp"
-                android:text="Undo-Favorite"
-                android:textSize="20sp"
+                android:text="Click to remove it from Favorite"
+                android:textSize="13sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/holo_red_dark"
-                android:background="@android:color/holo_blue_light"/>
+                android:textColor="#FF5722"/>
         </LinearLayout>
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="5dp"
+        android:layout_height="3dp"
         android:background="@android:color/darker_gray"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"/>

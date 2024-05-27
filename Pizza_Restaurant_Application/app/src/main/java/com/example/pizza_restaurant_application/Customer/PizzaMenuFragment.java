@@ -16,10 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.pizza_restaurant_application.DataAPI.Pizza;
 import com.example.pizza_restaurant_application.DataAPI.DataBaseHelper;
 import com.example.pizza_restaurant_application.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,16 +37,18 @@ public class PizzaMenuFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pizza_menu, container, false);
 
+        // Initialize views
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         priceSpinner = view.findViewById(R.id.priceFilterSpinner);
         sizeSpinner = view.findViewById(R.id.sizeFilterSpinner);
         categorySpinner = view.findViewById(R.id.categoryFilterSpinner);
         searchEditText = view.findViewById(R.id.searchEditText);
 
+        // Setup spinners
         setupSpinners();
 
+        // Initialize database helper and fetch all pizzas
         databaseHelper = new DataBaseHelper(getContext());
         pizzaList = databaseHelper.getAllPizzas();
         adapter = new PizzaAdapter(pizzaList, pizza -> {
@@ -64,6 +65,7 @@ public class PizzaMenuFragment extends Fragment {
         return view;
     }
 
+    // Method to setup search functionality
     private void setupSearch() {
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -81,6 +83,7 @@ public class PizzaMenuFragment extends Fragment {
         });
     }
 
+    // Method to filter pizzas based on search query
     private void filterPizzas(String query) {
         List<Pizza> filteredList = new ArrayList<>();
         for (Pizza pizza : pizzaList) {
@@ -91,6 +94,7 @@ public class PizzaMenuFragment extends Fragment {
         adapter.filterList(filteredList);
     }
 
+    // Method to setup spinners for filtering pizzas by price, size, and category
     private void setupSpinners() {
         ArrayAdapter<CharSequence> priceAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.price_ranges, android.R.layout.simple_spinner_item);
@@ -104,10 +108,11 @@ public class PizzaMenuFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
+
             }
         });
 
+        // Size spinner setup
         ArrayAdapter<CharSequence> sizeAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.sizes, android.R.layout.simple_spinner_item);
         sizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -120,10 +125,11 @@ public class PizzaMenuFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
+
             }
         });
 
+        // Category spinner setup
         ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.categories, android.R.layout.simple_spinner_item);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -136,7 +142,7 @@ public class PizzaMenuFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
+
             }
         });
     }
@@ -176,6 +182,7 @@ public class PizzaMenuFragment extends Fragment {
         adapter.filterList(filteredList);
     }
 
+    // Method to check if the pizza price is within the selected price range
     private boolean isPizzaInPriceRange(double pizzaPrice, String selectedPrice) {
         switch (selectedPrice) {
             case "Under $10":
@@ -184,7 +191,6 @@ public class PizzaMenuFragment extends Fragment {
                 return pizzaPrice >= 10.0 && pizzaPrice <= 15.0;
             case "Above $15":
                 return pizzaPrice > 15.0;
-            case "Any Price":
             default:
                 return true;
         }

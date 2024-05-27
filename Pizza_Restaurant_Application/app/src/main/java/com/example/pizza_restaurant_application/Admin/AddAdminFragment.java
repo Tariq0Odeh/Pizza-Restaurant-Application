@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.example.pizza_restaurant_application.DataAPI.DataBaseHelper;
 import com.example.pizza_restaurant_application.R;
-import com.example.pizza_restaurant_application.User;
+import com.example.pizza_restaurant_application.DataAPI.User;
 
 public class AddAdminFragment extends Fragment {
 
@@ -59,7 +59,7 @@ public class AddAdminFragment extends Fragment {
         String password = passwordEditText.getText().toString();
         String confirmPassword = confirmPasswordEditText.getText().toString();
 
-        if (validateInputs(email, phone, firstName, lastName, password, confirmPassword)) {
+        if (validateInputs(email, phone, firstName, lastName, gender, password, confirmPassword)) {
             if (dbHelper.checkEmailExists(email)) {
                 Toast.makeText(getContext(), "Email already exists", Toast.LENGTH_SHORT).show();
             } else if (dbHelper.checkPhoneExists(phone)) {
@@ -88,7 +88,7 @@ public class AddAdminFragment extends Fragment {
         }
     }
 
-    private boolean validateInputs(String email, String phone, String firstName, String lastName, String password, String confirmPassword) {
+    private boolean validateInputs(String email, String phone, String firstName, String lastName, String gender, String password, String confirmPassword) {
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Enter a valid email address");
             return false;
@@ -106,6 +106,11 @@ public class AddAdminFragment extends Fragment {
 
         if (lastName.isEmpty() || lastName.length() < 3) {
             lastNameEditText.setError("Enter a valid last name (at least 3 characters)");
+            return false;
+        }
+
+        if (gender.equals("Gender")) {
+            Toast.makeText(getContext(), "Please choose the gender", Toast.LENGTH_SHORT).show();
             return false;
         }
 

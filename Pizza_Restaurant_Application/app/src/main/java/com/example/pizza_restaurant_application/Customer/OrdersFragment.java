@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pizza_restaurant_application.DataAPI.DataBaseHelper;
+import com.example.pizza_restaurant_application.DataAPI.Order;
 import com.example.pizza_restaurant_application.R;
-import com.example.pizza_restaurant_application.SpecialOffers.SpecialOfferOrder;
-
+import com.example.pizza_restaurant_application.DataAPI.SpecialOfferOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,30 +25,31 @@ public class OrdersFragment extends Fragment {
     private OrderAdapter orderAdapter;
     private DataBaseHelper dbHelper;
 
+    // Method called to create the view hierarchy associated with the fragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_orders, container, false);
 
+        // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.ordersRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         dbHelper = new DataBaseHelper(getContext());
 
         // Fetch user's orders from the database
         List<Order> orderList = dbHelper.getUserOrders();
         List<SpecialOfferOrder> specialOrderList = dbHelper.getSpecialOfferOrders();
 
-        // Merge both lists
+        // Merge both lists into a single list
         List<Object> mergedList = new ArrayList<>();
         mergedList.addAll(orderList);
         mergedList.addAll(specialOrderList);
 
-        // Initialize and set the adapter
+        // Initialize and set the adapter with merged list and click listener
         orderAdapter = new OrderAdapter(mergedList, new OrderAdapter.OnOrderClickListener() {
             @Override
             public void onOrderClick(Object order) {
-                // Handle order click
-                // For example, display order details in a dialog
                 showOrderDetailsDialog(order);
             }
         });
@@ -64,15 +65,18 @@ public class OrdersFragment extends Fragment {
         if(order instanceof Order) {
             Order obj = (Order) order;
             builder.setTitle("Order Details");
-            orderDetails = String.format("Order ID: %d, Pizza Name: %s, Size: %s, Quantity: %d, Total Price: $%.2f, Date: %s, Time: %s", obj.getOrderId(), obj.getPizzaName(), obj.getSize(), obj.getQuantity(), obj.getTotalPrice(), obj.getDate(), obj.getTime());
-        }
-        else if(order instanceof SpecialOfferOrder) {
+            // Format order details
+            orderDetails = String.format("[Normal Order]\nOrder ID: %d\n\t- Pizza Name: %s\n\t- Size: %s\n\t- Quantity: %d\n\t- Total Price: $%.2f\n\t- Date: %s\n\t- Time: %s",
+                    obj.getOrderId(), obj.getPizzaName(), obj.getSize(), obj.getQuantity(), obj.getTotalPrice(), obj.getDate(), obj.getTime());
+        } else if(order instanceof SpecialOfferOrder) { // If the order is a special offer order
             builder.setTitle("Special Order Details");
             SpecialOfferOrder obj = (SpecialOfferOrder) order;
-            orderDetails = String.format("Order ID: %d, Pizza Name: %s, Size: %s, Total Price: $%.2f, Date: %s, Time: %s", obj.getOrderId(), obj.getPizzaName(), obj.getSize(), obj.getTotalPrice(), obj.getOrderDate(), obj.getOrderTime());
-
+            // Format special offer order details
+            orderDetails = String.format("[Special Order]\nOrder ID: %d\n\t- Pizza Name: %s\n\t- Size: %s\n\t- Total Price: $%.2f\n\t- Date: %s\n\t- Time: %s",
+                    obj.getOrderId(), obj.getPizzaName(), obj.getSize(), obj.getTotalPrice(), obj.getOrderDate(), obj.getOrderTime());
         }
 
+        // Set the dialog message and positive button
         builder.setMessage(orderDetails);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override

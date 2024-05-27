@@ -6,15 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-
-import com.example.pizza_restaurant_application.Customer.Order;
-import com.example.pizza_restaurant_application.Admin.OrderWithCustomerName;
-import com.example.pizza_restaurant_application.Customer.Pizza;
-import com.example.pizza_restaurant_application.User;
-import com.example.pizza_restaurant_application.SpecialOffers.SpecialOffer;
-import com.example.pizza_restaurant_application.SpecialOffers.SpecialOfferOrder;
-import com.example.pizza_restaurant_application.Admin.SpecialOrderWithCustomerName;
-
+import com.example.pizza_restaurant_application.DataAPI.Order;
+import com.example.pizza_restaurant_application.DataAPI.OrderWithCustomerName;
+import com.example.pizza_restaurant_application.DataAPI.Pizza;
+import com.example.pizza_restaurant_application.DataAPI.SpecialOffer;
+import com.example.pizza_restaurant_application.DataAPI.SpecialOrderWithCustomerName;
+import com.example.pizza_restaurant_application.DataAPI.User;
+import com.example.pizza_restaurant_application.DataAPI.SpecialOfferOrder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -24,8 +22,8 @@ import java.util.Map;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "Database2";
-    private static final int DATABASE_VERSION = 9;
+    private static final String DATABASE_NAME = "Pizza_Database";
+    private static final int DATABASE_VERSION = 1;
 
     // Tables
     private static final String TABLE_USER = "user";
@@ -69,13 +67,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ORDER_DATE = "date";
     private static final String COLUMN_ORDER_TIME = "time";
 
+    //Others table columns
     private static final String COLUMN_SPECIAL_OFFER_ID = "special_offer_id";
-
-    // Update the table columns
     private static final String COLUMN_SPECIAL_OFFER_ORDER_ID = "special_offer_order_id";
-
     private static final String COLUMN_SPECIAL_OFFER_FAVORITE_ID = "special_offer_favorite_id";
 
+    // Global Variables
     private static String user_email = "";
     private boolean clearTableFlag = false;
 
@@ -191,6 +188,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    // ---------------------------------------------
+
     public boolean insertUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -212,56 +211,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-   //+++++++++++++++++++++++++++++++++++++++++++++++++
-
-    // Method to check if a pizza exists in the database
-    public boolean pizzaExists(String pizzaName) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_PIZZA, new String[]{COLUMN_PIZZA_NAME},
-                COLUMN_PIZZA_NAME + " = ?", new String[]{pizzaName},
-                null, null, null);
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-        db.close();
-        return exists;
-    }
-
-    // Method to update an existing pizza
-    public boolean updatePizza(Pizza pizza) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_PIZZA_CATEGORY, pizza.getCategory());
-        values.put(COLUMN_PIZZA_DESCRIPTION, pizza.getDescription());
-        values.put(COLUMN_PIZZA_SMALL_PRICE, pizza.getSmallPrice());
-        values.put(COLUMN_PIZZA_MEDIUM_PRICE, pizza.getMediumPrice());
-        values.put(COLUMN_PIZZA_LARGE_PRICE, pizza.getLargePrice());
-        int rowsAffected = db.update(TABLE_PIZZA, values,
-                COLUMN_PIZZA_NAME + " = ?", new String[]{pizza.getName()});
-        db.close();
-        return rowsAffected > 0;
-    }
-
-
-    // Method to insert or update a pizza
-    public boolean insertPizza(Pizza pizza) {
-        if (pizzaExists(pizza.getName())) {
-            return updatePizza(pizza);
-        } else {
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_PIZZA_NAME, pizza.getName());
-            values.put(COLUMN_PIZZA_CATEGORY, pizza.getCategory());
-            values.put(COLUMN_PIZZA_DESCRIPTION, pizza.getDescription());
-            values.put(COLUMN_PIZZA_SMALL_PRICE, pizza.getSmallPrice());
-            values.put(COLUMN_PIZZA_MEDIUM_PRICE, pizza.getMediumPrice());
-            values.put(COLUMN_PIZZA_LARGE_PRICE, pizza.getLargePrice());
-            long result = db.insert(TABLE_PIZZA, null, values);
-            db.close();
-            return result != -1;
-        }
-    }
-
-    //+++++++++++++++++++++++++++++++++++++++++++++++++
 
     public boolean checkEmailExists(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -304,7 +253,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void  setUserEmail(String email) {
+    public void setUserEmail(String email) {
         user_email = email;
     }
 
@@ -326,7 +275,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return user;
     }
-
 
     public boolean updateUserInfo(String email, String firstName, String lastName, String phone) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -355,12 +303,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public void insertAdminUserIfNeeded() {
-        if (!checkEmailExists("t@gmail.com")) {
+        if (!checkEmailExists("tariq@gmail.com")) {
             User adminUser = new User(
-                    "t@gmail.com",
+                    "tariq@gmail.com",
                     "0509876543",
-                    "tariq",
-                    "odeh",
+                    "Tariq",
+                    "Odeh",
                     "male",
                     "ttpp1100",
                     null,
@@ -368,6 +316,51 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             );
             insertUser(adminUser);
         }
+    }
+
+    // ---------------------------------------------
+
+    public boolean insertPizza(Pizza pizza) {
+        if (pizzaExists(pizza.getName())) {
+            return updatePizza(pizza);
+        } else {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_PIZZA_NAME, pizza.getName());
+            values.put(COLUMN_PIZZA_CATEGORY, pizza.getCategory());
+            values.put(COLUMN_PIZZA_DESCRIPTION, pizza.getDescription());
+            values.put(COLUMN_PIZZA_SMALL_PRICE, pizza.getSmallPrice());
+            values.put(COLUMN_PIZZA_MEDIUM_PRICE, pizza.getMediumPrice());
+            values.put(COLUMN_PIZZA_LARGE_PRICE, pizza.getLargePrice());
+            long result = db.insert(TABLE_PIZZA, null, values);
+            db.close();
+            return result != -1;
+        }
+    }
+
+    public boolean pizzaExists(String pizzaName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_PIZZA, new String[]{COLUMN_PIZZA_NAME},
+                COLUMN_PIZZA_NAME + " = ?", new String[]{pizzaName},
+                null, null, null);
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
+
+    public boolean updatePizza(Pizza pizza) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PIZZA_CATEGORY, pizza.getCategory());
+        values.put(COLUMN_PIZZA_DESCRIPTION, pizza.getDescription());
+        values.put(COLUMN_PIZZA_SMALL_PRICE, pizza.getSmallPrice());
+        values.put(COLUMN_PIZZA_MEDIUM_PRICE, pizza.getMediumPrice());
+        values.put(COLUMN_PIZZA_LARGE_PRICE, pizza.getLargePrice());
+        int rowsAffected = db.update(TABLE_PIZZA, values,
+                COLUMN_PIZZA_NAME + " = ?", new String[]{pizza.getName()});
+        db.close();
+        return rowsAffected > 0;
     }
 
     public List<Pizza> getAllPizzas() {
@@ -398,11 +391,35 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return pizzas;
     }
 
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    public List<String> getAllPizzaTypes() {
+        List<String> pizzaTypes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT DISTINCT " + COLUMN_PIZZA_NAME + " FROM " + TABLE_PIZZA, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String pizzaType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
+                pizzaTypes.add(pizzaType);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return pizzaTypes;
+    }
 
-    // Method to add a favorite pizza for a user
+    // ---------------------------------------------
+
     public boolean addFavoritePizza(int pizzaId) {
         SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_FAVORITES + " WHERE " + COLUMN_USER_EMAIL + " = ? AND " + COLUMN_FAVORITE_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{user_email, String.valueOf(pizzaId)});
+        boolean pizzaExists = cursor.getCount() > 0;
+        cursor.close();
+
+        if (pizzaExists) {
+            db.close();
+            return false;
+        }
+
+        // If the pizza is not already in the favorites, add it
         ContentValues values = new ContentValues();
         values.put(COLUMN_USER_EMAIL, user_email);
         values.put(COLUMN_FAVORITE_ID, pizzaId);
@@ -411,7 +428,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    // Method to remove a favorite pizza for a user
     public boolean removeFavoritePizza(int pizzaId) {
         SQLiteDatabase db = this.getWritableDatabase();
         int result = db.delete(TABLE_FAVORITES, COLUMN_USER_EMAIL + " = ? AND " + COLUMN_FAVORITE_ID + " = ?",
@@ -420,7 +436,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result > 0;
     }
 
-    // Method to get all favorite pizzas for a user
     public List<Pizza> getFavoritePizzas() {
         List<Pizza> favoritePizzas = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -455,21 +470,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public int getPizzaIdByName(String pizzaName) {
         SQLiteDatabase db = this.getReadableDatabase();
-        int pizzaId = -1; // Default value if pizza ID is not found
+        int pizzaId = -1;
         Cursor cursor = db.query(TABLE_PIZZA,
                 new String[]{COLUMN_ID},
                 COLUMN_PIZZA_NAME + "=?",
                 new String[]{pizzaName},
                 null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
-            // If cursor is not null and contains at least one row, extract the pizza ID
             pizzaId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
             cursor.close();
         }
         return pizzaId;
     }
 
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // ---------------------------------------------
 
     public boolean insertOrder(int pizzaId, String pizzaName, String size, int quantity, double totalPrice, String date, String time) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -509,8 +523,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return orders;
     }
 
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
     public List<OrderWithCustomerName> getAllOrdersWithCustomerName() {
         List<OrderWithCustomerName> ordersWithCustomerName = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -544,21 +556,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return ordersWithCustomerName;
     }
 
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    public List<String> getAllPizzaTypes() {
-        List<String> pizzaTypes = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT DISTINCT " + COLUMN_PIZZA_NAME + " FROM " + TABLE_PIZZA, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String pizzaType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PIZZA_NAME));
-                pizzaTypes.add(pizzaType);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        return pizzaTypes;
-    }
+    // ---------------------------------------------
 
     public boolean insertSpecialOffer(String type, String size, double price, String period) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -581,8 +579,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         // Insert the special offer with all the necessary information
         ContentValues values = new ContentValues();
         values.put(COLUMN_PIZZA_NAME, type);
-        values.put(COLUMN_PIZZA_CATEGORY, category); // Add pizza category
-        values.put(COLUMN_PIZZA_DESCRIPTION, description); // Add pizza description
+        values.put(COLUMN_PIZZA_CATEGORY, category);
+        values.put(COLUMN_PIZZA_DESCRIPTION, description);
         values.put(COLUMN_ORDER_SIZE, size);
         values.put(COLUMN_ORDER_TOTAL_PRICE, price);
         values.put(COLUMN_ORDER_DATE, period);
@@ -610,7 +608,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 double price = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_ORDER_TOTAL_PRICE));
                 String period = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_DATE));
 
-                // Creating SpecialOffer object and adding to the list
                 SpecialOffer specialOffer = new SpecialOffer(specialOfferId, pizzaName, category, description, size, price, period);
                 specialOffers.add(specialOffer);
             } while (cursor.moveToNext());
@@ -622,9 +619,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return specialOffers;
     }
 
-
-    //++++++++++++++++++++++++++++++++++++++++++++++++
-
+    // ---------------------------------------------
 
     public boolean insertSpecialOfferOrder(int specialOfferId, String pizzaName, String size, int quantity, double totalPrice, String date, String time) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -641,8 +636,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.close();
         return result != -1;
     }
-
-
 
     public List<SpecialOfferOrder> getSpecialOfferOrders() {
         List<SpecialOfferOrder> specialOfferOrders = new ArrayList<>();
@@ -664,7 +657,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return specialOfferOrders;
     }
-
 
     public List<SpecialOrderWithCustomerName> getSpecialOfferOrdersWithName() {
         List<SpecialOrderWithCustomerName> specialOfferOrdersWithCustomerName = new ArrayList<>();
@@ -701,9 +693,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return specialOfferOrdersWithCustomerName;
     }
 
-
-
-    //++++++++++++++++++++++++++++++++++++++++++++++++
+    // ---------------------------------------------
 
     public boolean addFavoriteSpecialOffer(int specialOfferId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -733,7 +723,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.close();
         return isFavorite;
     }
-
 
     public List<SpecialOffer> getFavoriteSpecialOffers() {
         List<SpecialOffer> favoriteSpecialOffers = new ArrayList<>();
@@ -769,7 +758,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return favoriteSpecialOffers;
     }
 
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // ---------------------------------------------
 
     public Map<String, Integer> getOrdersPerPizzaType() {
         Map<String, Integer> ordersPerType = new HashMap<>();
@@ -806,7 +795,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return incomePerType;
     }
 
-
     public double getTotalIncomeForAllTypes() {
         double totalIncome = 0.0;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -818,4 +806,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return totalIncome;
     }
+
+    // ---------------------------------------------
+
 }

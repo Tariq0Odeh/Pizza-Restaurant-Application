@@ -12,7 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.pizza_restaurant_application.DataAPI.DataBaseHelper;
 import com.example.pizza_restaurant_application.R;
-import com.example.pizza_restaurant_application.User;
+import com.example.pizza_restaurant_application.DataAPI.User;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -60,7 +60,7 @@ public class SignUpActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString();
         String confirmPassword = confirmPasswordEditText.getText().toString();
 
-        if (validateInputs(email, phone, firstName, lastName, password, confirmPassword)) {
+        if (validateInputs(email, phone, firstName, lastName, gender, password, confirmPassword)) {
             // Check if email or phone already exists in database
             if (dbHelper.checkEmailExists(email)) {
                 Toast.makeText(SignUpActivity.this, "Email already exists", Toast.LENGTH_SHORT).show();
@@ -87,7 +87,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     // Method to validate input fields
-    private boolean validateInputs(String email, String phone, String firstName, String lastName, String password, String confirmPassword) {
+    private boolean validateInputs(String email, String phone, String firstName, String lastName, String gender, String password, String confirmPassword) {
         // Validate email
         if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Enter a valid email address");
@@ -109,6 +109,11 @@ public class SignUpActivity extends AppCompatActivity {
         // Validate last name
         if (TextUtils.isEmpty(lastName) || lastName.length() < 3) {
             lastNameEditText.setError("Enter a valid last name (at least 3 characters)");
+            return false;
+        }
+
+        if (gender.equals("Gender")) {
+            Toast.makeText(this, "Please choose the gender", Toast.LENGTH_SHORT).show();
             return false;
         }
 

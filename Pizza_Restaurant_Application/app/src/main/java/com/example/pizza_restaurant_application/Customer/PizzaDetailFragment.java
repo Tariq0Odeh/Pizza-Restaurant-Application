@@ -14,14 +14,12 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import com.example.pizza_restaurant_application.DataAPI.DataBaseHelper;
+import com.example.pizza_restaurant_application.DataAPI.Pizza;
 import com.example.pizza_restaurant_application.R;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -61,7 +59,6 @@ public class PizzaDetailFragment extends Fragment {
         ImageView imageView = view.findViewById(R.id.imageView);
         Button addToFavoritesButton = view.findViewById(R.id.addToFavoritesButton);
         Button orderButton = view.findViewById(R.id.orderButton);
-        Button submitOrderButton = view.findViewById(R.id.submitOrderButton);
 
         if (pizza != null) {
             nameTextView.setText(pizza.getName());
@@ -73,13 +70,15 @@ public class PizzaDetailFragment extends Fragment {
 
             loadImage(pizza.getName(), imageView);
 
+            // Check if pizza is favorite and update UI
             isFavorite = checkIfPizzaIsFavorite();
             if (isFavorite) {
-                addToFavoritesButton.setBackgroundResource(R.drawable.heart_filled);
+                addToFavoritesButton.setBackgroundResource(R.drawable.heart_red);
             } else {
-                addToFavoritesButton.setBackgroundResource(R.drawable.heart_shape);
+                addToFavoritesButton.setBackgroundResource(R.drawable.heart);
             }
 
+            // Handle addToFavoritesButton click
             addToFavoritesButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -92,15 +91,15 @@ public class PizzaDetailFragment extends Fragment {
                     }
                     isFavorite = !isFavorite;
                     if (isFavorite) {
-                        addToFavoritesButton.setBackgroundResource(R.drawable.heart_filled);
+                        addToFavoritesButton.setBackgroundResource(R.drawable.heart_red);
                     } else {
-                        addToFavoritesButton.setBackgroundResource(R.drawable.heart_shape);
+                        addToFavoritesButton.setBackgroundResource(R.drawable.heart);
                     }
                 }
             });
 
 
-
+            // Handle orderButton click
             orderButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -112,6 +111,7 @@ public class PizzaDetailFragment extends Fragment {
         return view;
     }
 
+    // Method to check if pizza is favorite
     private boolean checkIfPizzaIsFavorite() {
         List<Pizza> favoritePizzas = dbHelper.getFavoritePizzas();
         for (Pizza favPizza : favoritePizzas) {
@@ -122,6 +122,7 @@ public class PizzaDetailFragment extends Fragment {
         return false;
     }
 
+    // Method to add pizza to favorites
     private void addPizzaToFavorites() {
         List<Pizza> favoritePizzas = dbHelper.getFavoritePizzas();
         if (!favoritePizzas.contains(pizza)) {
@@ -132,6 +133,7 @@ public class PizzaDetailFragment extends Fragment {
         }
     }
 
+    // Method to remove pizza from favorites
     private void removePizzaFromFavorites() {
         List<Pizza> favoritePizzas = dbHelper.getFavoritePizzas();
         if (favoritePizzas.contains(pizza)) {
@@ -142,6 +144,7 @@ public class PizzaDetailFragment extends Fragment {
         }
     }
 
+    // Method to show toast message
     private void showToast(String message) {
         Context context = getContext();
         if (context != null) {
@@ -149,6 +152,7 @@ public class PizzaDetailFragment extends Fragment {
         }
     }
 
+    // Method to load image based on pizza name
     private void loadImage(String pizzaName, ImageView imageView) {
         switch (pizza.getName()) {
             case "Margherita Pizza":
@@ -196,6 +200,7 @@ public class PizzaDetailFragment extends Fragment {
         }
     }
 
+    // Method to show order dialog
     private void showOrderDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getLayoutInflater();
@@ -256,11 +261,10 @@ public class PizzaDetailFragment extends Fragment {
                 // Get current time
                 long currentTimeMillis = System.currentTimeMillis();
                 String time = formatTime(String.valueOf(currentTimeMillis));
-
                 // Insert the order into the database
                 boolean success = dbHelper.insertOrder(dbHelper.getPizzaIdByName(pizza.getName()), pizza.getName(), size, quantity, price, date, time);
                 if (success) {
-                    showToast(String.format("Ordered %d %s pizza(s) for $%.2f", quantity, size, price));
+                    showToast(String.format("Ordered %d %s pizzas for $%.2f", quantity, size, price));
                 } else {
                     showToast("Failed to submit order.");
                 }
@@ -271,6 +275,7 @@ public class PizzaDetailFragment extends Fragment {
         dialog.show();
     }
 
+    // Method to update price text view based on selected size
     private void updatePriceTextView(TextView priceTextView, int sizePosition) {
         double price;
         switch (sizePosition) {
@@ -287,9 +292,10 @@ public class PizzaDetailFragment extends Fragment {
                 price = 0.0;
                 break;
         }
-        priceTextView.setText(String.format("Price: $%.2f", price));
+        priceTextView.setText(String.format("Price per one unit: $%.2f", price));
     }
 
+    // Method to get price for size
     private double getPriceForSize(String size) {
         switch (size) {
             case "Small":
@@ -303,12 +309,14 @@ public class PizzaDetailFragment extends Fragment {
         }
     }
 
+    // Method to get current date
     private String getCurrentDate(){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Date date = new Date();
         return dateFormat.format(date);
     }
 
+    // Method to format time from milliseconds
     private String formatTime(String timestamp) {
         long millis = Long.parseLong(timestamp);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());

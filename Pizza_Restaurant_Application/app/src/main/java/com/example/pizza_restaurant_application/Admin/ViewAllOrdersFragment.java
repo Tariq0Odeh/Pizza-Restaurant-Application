@@ -5,15 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.example.pizza_restaurant_application.Admin.AllOrderAdapter;
 import com.example.pizza_restaurant_application.DataAPI.DataBaseHelper;
 import com.example.pizza_restaurant_application.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,21 +31,14 @@ public class ViewAllOrdersFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         ordersListView = view.findViewById(R.id.ordersListView);
-
-        // Fetch all orders with customer names from the database
         List<Object> allOrdersWithCustomerName = getAllOrdersWithCustomerName();
-
-        // Create a custom adapter to display the orders in the ListView
         AllOrderAdapter adapter = new AllOrderAdapter(requireContext(), allOrdersWithCustomerName);
-
-        // Set the adapter to the ListView
         ordersListView.setAdapter(adapter);
     }
 
+    // Method to get all orders with customer names
     private List<Object> getAllOrdersWithCustomerName() {
-        // Use the database helper to fetch all orders with customer names
         DataBaseHelper dbHelper = new DataBaseHelper(requireContext());
         List<Object> allOrders = new ArrayList<>();
         allOrders.addAll(dbHelper.getAllOrdersWithCustomerName());

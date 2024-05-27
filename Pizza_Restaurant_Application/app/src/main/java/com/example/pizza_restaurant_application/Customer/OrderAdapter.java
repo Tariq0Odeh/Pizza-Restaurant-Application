@@ -6,25 +6,28 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.pizza_restaurant_application.DataAPI.Order;
 import com.example.pizza_restaurant_application.R;
-import com.example.pizza_restaurant_application.SpecialOffers.SpecialOfferOrder;
-
+import com.example.pizza_restaurant_application.DataAPI.SpecialOfferOrder;
 import java.util.List;
+
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
     private List<Object> orderList;
     private OnOrderClickListener listener;
 
+    // Interface for click events on orders
     public interface OnOrderClickListener {
         void onOrderClick(Object order);
     }
 
+    // Constructor to initialize order list and click listener
     public OrderAdapter(List<Object> orderList, OnOrderClickListener listener) {
         this.orderList = orderList;
         this.listener = listener;
     }
 
+    // Create new views (invoked by the layout manager)
     @NonNull
     @Override
     public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -32,17 +35,20 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         return new OrderViewHolder(view);
     }
 
+    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
         Object order = orderList.get(position);
         holder.bind(order);
     }
 
+    // Return the size of the order list (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return orderList.size();
     }
 
+    // ViewHolder class to hold and manage the view for each order
     class OrderViewHolder extends RecyclerView.ViewHolder {
         TextView orderTextView;
 
@@ -63,16 +69,18 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             });
         }
 
+        // Bind the order object to the view holder
         void bind(Object order) {
-            if(order instanceof Order) {
+            if (order instanceof Order) {
                 Order obj = (Order) order;
-                orderTextView.setText(String.format("Order ID: %d, Pizza Name: %s, Date: %s, Time: %s",
-                        obj.getOrderId(), obj.getPizzaName(), obj.getDate(), obj.getTime()));
-            }
-            else if(order instanceof SpecialOfferOrder) {
+                // Set the text of the TextView with order details
+                orderTextView.setText(String.format("\n\t- Pizza Name: %s\n\t- Date: %s\n\t- Time: %s",
+                        obj.getPizzaName(), obj.getDate(), obj.getTime()));
+            } else if (order instanceof SpecialOfferOrder) { // Check if the object is a SpecialOfferOrder
                 SpecialOfferOrder obj = (SpecialOfferOrder) order;
-                orderTextView.setText(String.format("Order ID: %d, Pizza Name: %s, Date: %s, Time: %s",
-                        obj.getOrderId(), obj.getPizzaName(), obj.getOrderDate(), obj.getOrderTime()));
+                // Set the text of the TextView with special offer order details
+                orderTextView.setText(String.format("\n\t- Pizza Name: %s\n\t- Date: %s\n\t- Time: %s",
+                       obj.getPizzaName(), obj.getOrderDate(), obj.getOrderTime()));
             }
         }
     }

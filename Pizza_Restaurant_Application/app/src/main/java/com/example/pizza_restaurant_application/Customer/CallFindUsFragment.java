@@ -8,14 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-
 import androidx.fragment.app.Fragment;
-
 import com.example.pizza_restaurant_application.R;
 
 public class CallFindUsFragment extends Fragment implements View.OnClickListener {
 
     public CallFindUsFragment() {
+        // Required empty public constructor
     }
 
     @Override
@@ -23,10 +22,10 @@ public class CallFindUsFragment extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_call_find_us, container, false);
 
+        // Find buttons by their IDs
         Button btnCall = view.findViewById(R.id.btn_call);
         Button btnFind = view.findViewById(R.id.btn_find);
         Button btnEmail = view.findViewById(R.id.btn_email);
-
         btnCall.setOnClickListener(this);
         btnFind.setOnClickListener(this);
         btnEmail.setOnClickListener(this);

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <!-- Search Bar -->
     <EditText
@@ -12,29 +15,46 @@
         android:layout_height="wrap_content"
         android:hint="Search for a pizza"
         android:inputType="text"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/black"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:layout_marginBottom="8dp" />
 
+    <!-- Price Filter Spinner -->
     <Spinner
         android:id="@+id/priceFilterSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/price_ranges" />
+        android:layout_marginBottom="8dp"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/black" />
 
+    <!-- Size Filter Spinner -->
     <Spinner
         android:id="@+id/sizeFilterSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/sizes" />
+        android:layout_marginBottom="8dp"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/black" />
 
+    <!-- Category Filter Spinner -->
     <Spinner
         android:id="@+id/categoryFilterSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/categories" />
+        android:layout_marginBottom="8dp"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/black" />
 
+    <!-- RecyclerView for displaying pizza items -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:layout_marginTop="8dp" />
 
 </LinearLayout>

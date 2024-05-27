@@ -33,7 +33,7 @@
             android:name=".LoginORSignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".Registration.MainActivity"
+            android:name=".DataAPI.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

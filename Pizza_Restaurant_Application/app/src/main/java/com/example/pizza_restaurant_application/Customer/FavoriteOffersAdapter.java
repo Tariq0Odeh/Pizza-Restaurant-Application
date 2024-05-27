@@ -7,26 +7,25 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.pizza_restaurant_application.R;
-import com.example.pizza_restaurant_application.SpecialOffers.SpecialOffer;
-
+import com.example.pizza_restaurant_application.DataAPI.SpecialOffer;
 import java.util.List;
 
 public class FavoriteOffersAdapter extends RecyclerView.Adapter<FavoriteOffersAdapter.FavoritePizzaViewHolder> {
     private List<SpecialOffer> favoritePizzaList;
-    private List<SpecialOffer> originalList; // To keep track of the original list
+    private List<SpecialOffer> originalList;
     private OnFavoritePizzaClickListener listener;
-    private List<SpecialOffer> filteredList; // New filtered list
+    private List<SpecialOffer> filteredList;
 
 
     public interface OnFavoritePizzaClickListener {
         void onFavoritePizzaClick(SpecialOffer pizza);
     }
 
+    // Constructor to initialize the adapter with the list of favorite pizzas and click listener
     public FavoriteOffersAdapter(List<SpecialOffer> favoritePizzaList, OnFavoritePizzaClickListener listener) {
         this.favoritePizzaList = favoritePizzaList;
-        this.originalList = favoritePizzaList; // Initialize the original list
+        this.originalList = favoritePizzaList;
         this.listener = listener;
     }
 
@@ -52,16 +51,17 @@ public class FavoriteOffersAdapter extends RecyclerView.Adapter<FavoriteOffersAd
     // Method to update the list with a new filtered list
     public void updateListOffers(List<SpecialOffer> filteredList) {
         favoritePizzaList = filteredList;
-        notifyDataSetChanged(); // Notify the adapter that the dataset has changed
+        notifyDataSetChanged();
     }
 
 
     // Method to reset the list to its original state
     public void resetList() {
         favoritePizzaList = originalList;
-        notifyDataSetChanged(); // Notify the adapter that the dataset has changed
+        notifyDataSetChanged();
     }
 
+    // ViewHolder class for the RecyclerView
     class FavoritePizzaViewHolder extends RecyclerView.ViewHolder {
         TextView nameTextView;
         ImageView imageView;
@@ -74,7 +74,6 @@ public class FavoriteOffersAdapter extends RecyclerView.Adapter<FavoriteOffersAd
 
         public void bind(SpecialOffer pizza) {
             nameTextView.setText(pizza.getPizzaName());
-            // Set image resource based on pizza's name
             switch (pizza.getPizzaName()) {
                 case "Margherita Pizza":
                     imageView.setImageResource(R.drawable.margarita);
@@ -88,7 +87,33 @@ public class FavoriteOffersAdapter extends RecyclerView.Adapter<FavoriteOffersAd
                 case "Pepperoni Pizza":
                     imageView.setImageResource(R.drawable.pepperoni);
                     break;
-                // Add other cases as needed
+                case "New York Style Pizza":
+                    imageView.setImageResource(R.drawable.new_york_style);
+                    break;
+                case "Calzone":
+                    imageView.setImageResource(R.drawable.calzone);
+                    break;
+                case "Tandoori Chicken Pizza":
+                    imageView.setImageResource(R.drawable.tandoori_chicken);
+                    break;
+                case "BBQ Chicken Pizza":
+                    imageView.setImageResource(R.drawable.bbq_chicken);
+                    break;
+                case "Seafood Pizza":
+                    imageView.setImageResource(R.drawable.seafood);
+                    break;
+                case "Vegetarian Pizza":
+                    imageView.setImageResource(R.drawable.vegetarian);
+                    break;
+                case "Buffalo Chicken Pizza":
+                    imageView.setImageResource(R.drawable.buffalo_chicken);
+                    break;
+                case "Mushroom Truffle Pizza":
+                    imageView.setImageResource(R.drawable.mushroom_truffle);
+                    break;
+                case "Pesto Chicken Pizza":
+                    imageView.setImageResource(R.drawable.pesto_chicken);
+                    break;
                 default:
                     imageView.setImageResource(R.drawable.pizza_icon);
                     break;
@@ -96,14 +121,15 @@ public class FavoriteOffersAdapter extends RecyclerView.Adapter<FavoriteOffersAd
         }
     }
 
+    // Method to remove a special offer from the list and notify the adapter
     public void removeSpecialOffer(SpecialOffer specialOffer) {
         favoritePizzaList.remove(specialOffer);
-        notifyDataSetChanged(); // Notify adapter of dataset change
+        notifyDataSetChanged();
     }
 
     // Method to filter the pizza list
     public void filterList(List<SpecialOffer> filteredList) {
         this.filteredList = filteredList;
-        notifyDataSetChanged(); // Notify adapter that the dataset has changed
+        notifyDataSetChanged();
     }
 }

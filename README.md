@@ -1,7 +1,9 @@
 # [Pizza Restaurant Android application](Pizza%20Restaurant%20Android%20Application.pdf)
 ---
 ## Objective
-
+A pizza restaurant is asking us to build an Android application which allows the restaurant’s users 
+to order their pizza online or using a local database, the application should be user friendly and 
+simple.
 
 ---
  ## How to run
@@ -13,6 +15,6 @@
 ---
 ## Languages And Tools:
 
-- <img align="left" alt="GitHub" width="50px" src="https://raw.githubusercontent.com/github/explore/78df643247d429f6cc873026c0622819ad797942/topics/github/github.png" /> <img align="left" alt="Linux" width="50px" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/800px-Tux.svg.png" /> 
+- <img align="left" alt="Android Studio" width="50px" src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/android-studio-icon.png" /> 
 
 <br/>

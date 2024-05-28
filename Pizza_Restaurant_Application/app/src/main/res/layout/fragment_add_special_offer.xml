@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <Spinner
+        android:id="@+id/typeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <Spinner
+        android:id="@+id/sizeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/typeSpinner"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:entries="@array/sizes" />
+
+    <EditText
+        android:id="@+id/priceEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sizeSpinner"
+        android:layout_marginBottom="16dp"
+        android:hint="Enter Price"
+        android:inputType="numberDecimal" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/periodButton"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/priceEditText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:elevation="4dp"
+        android:text="Select Date" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addOfferButton"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/periodButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:elevation="4dp"
+        android:text="Add Offer" />
+
+</RelativeLayout>

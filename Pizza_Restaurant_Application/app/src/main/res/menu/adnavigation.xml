@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_admin_profile"
+            android:icon="@drawable/user_icon"
+            android:title="Admin Profile" />
+        <item
+            android:id="@+id/nav_add_admin"
+            android:icon="@drawable/add_user_icon"
+            android:title="Add Admin" />
+        <item
+            android:id="@+id/nav_view_all_orders"
+            android:icon="@drawable/orders_icon"
+            android:title="View All Orders" />
+        <item
+            android:id="@+id/nav_add_special_offers"
+            android:icon="@drawable/special_offer_icon"
+            android:title="Add Special Offers" />
+        <item
+            android:id="@+id/nav_view_Statistics"
+            android:icon="@drawable/statistics_icon"
+
+            android:title="View Statistics" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/logout_icon"
+            android:title="Logout" />
+    </group>
+</menu>

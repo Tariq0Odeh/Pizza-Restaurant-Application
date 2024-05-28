@@ -1,5 +1,7 @@
 # Pizza Restaurant Android Application
 
+
+
 ## Project Description
 
 Android application for a pizza restaurant to facilitate online pizza ordering. The application aims to provide a user-friendly and straightforward experience. Here's a breakdown of the required functionalities:
@@ -45,6 +47,40 @@ Similar to the customer layout but with additional functionalities for admins:
 
 - **Adding a Profile Picture for the Customer:** Allows customers to set and change their profile picture.
 - **Admin Features:** Enables admins to calculate order statistics and total income for each pizza type.
+
+
+## Gallery
+
+### Initial Photo
+[![Initial Photo](Photos/Screen1.png)](Photos)
+
+<details>
+  <summary>Click to show all photos</summary>
+
+  ### Screen1
+  ![Screen1](Photos/Screen1.png)
+
+  ### Screen2
+  ![Screen2](Photos/Screen2.png)
+
+  ### Screen3
+  ![Screen3](Photos/Screen3.png)
+
+  ### Screen4
+  ![Screen4](Photos/Screen4.png)
+
+  ### Screen5
+  ![Screen5](Photos/Screen5.png)
+
+  ### Screen6
+  ![Screen6](Photos/Screen6.png)
+
+  ### Screen7
+  ![Screen7](Photos/Screen7.png)
+
+  ### Screen8
+  ![Screen8](Photos/Screen8.png)
+</details>
 
 ## How to Run
 
